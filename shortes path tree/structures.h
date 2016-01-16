@@ -6,6 +6,7 @@
 #define min(a,b) ((a)<(b)?(a):(b))
 
 typedef struct LineStruct Line;
+typedef struct OutSpanningTreeEdgeStruct OutSpanningTreeEdge;
 typedef struct VertexStruct Vertex;
 typedef struct EdgeStruct Edge;
 
@@ -26,17 +27,24 @@ struct LineStruct
 void readInputLines(const char * const filename, Line ** const horizontal_lines, Line ** const vertical_lines);
 void append_line_to_list( Line * const line_to_add, Line ** const list_head);
 bool doIntersect(const Line * const l1, const Line * const l2);
+bool onSegment(int px, int py, int qx, int qy, int rx, int ry);
+
+struct OutSpanningTreeEdgeStruct
+{
+	Line *l1;
+	Line *l2;
+	Point cross;
+	int weight;
+	OutSpanningTreeEdge * next;
+};
 
 struct VertexStruct
 {
-    Line *a;
     Line *b;
-    int X;
-    int Y;
-    Vertex *next;
     Edge *edges;
     int edgeCount;
 	bool isInAnyMST;
+	Vertex *next;
 };
 bool are_verticies_equal(const Vertex * const v1, const Vertex * const v2);
 // calculate distance between two verticies.

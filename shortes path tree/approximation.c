@@ -47,7 +47,7 @@ Point getCrossPoint(const Line * l1, const Line * l2)
 	return p;
 }
 
-Edge * buildApproximation(Line * lines_verticies_form, Line * lines_intersects_verticies_lines)
+Edge * buildLowerBoundApproximationPart(Line * lines_verticies_form, Line * lines_intersects_verticies_lines)
 {
 	///////build graph///////
 

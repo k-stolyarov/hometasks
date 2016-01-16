@@ -109,7 +109,7 @@ void initializeWindow(int argc, char **argv, int xBound, int yBound)
 	else
 		XSetForeground(display_ptr, gc_yellow, tmp_color1.pixel);
 	gc_red = XCreateGC(display_ptr, win, valuemask, &gc_red_values);
-	XSetLineAttributes(display_ptr, gc_red, 2, LineSolid, CapRound, JoinRound);
+	XSetLineAttributes(display_ptr, gc_red, 5, LineSolid, CapRound, JoinRound);
 	if (XAllocNamedColor(display_ptr, color_map, "red",
 		&tmp_color1, &tmp_color2) == 0)
 	{
@@ -194,10 +194,22 @@ float edgesLength(Edge * const edges)
 	return result;
 }
 
-void disspayLowerBoundApproximationCost(Edge * const approximation1, Edge * const approximation2, Edge * const any_solution)
+int spanningEdgesLength(const OutSpanningTreeEdge * const spanning_tree)
+{
+	int result = 0;
+	const OutSpanningTreeEdge * e = spanning_tree;
+	while(NULL != e)
+	{
+		result += e->weight;
+		e = e->next;
+	}
+	return result;
+}
+
+void disspayLowerBoundApproximationCost(Edge * const approximation1, Edge * const approximation2, const OutSpanningTreeEdge * const spanning_tree)
 {
 	const float lower_bound_length = edgesLength(approximation1) + edgesLength(approximation2);
-	const float solution_length = edgesLength(any_solution);
+	const float solution_length = spanningEdgesLength(spanning_tree);
 	char buffer[512];
 	sprintf(buffer, "Lower bound: %0.0f", lower_bound_length);
 	XDrawString (display_ptr, win, gc, 10, 50, buffer, strlen (buffer) );
@@ -206,16 +218,44 @@ void disspayLowerBoundApproximationCost(Edge * const approximation1, Edge * cons
 
 }
 
-void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2, Edge * const any_solution)
+void displayLine(const GC desired_gc, Point p1, Point p2)
+{
+	XDrawLine(display_ptr, win, desired_gc, p1.x, p1.y, p2.x, p2.y);
+}
+
+void displaySpanningTreeEdge(const GC desired_gc, const OutSpanningTreeEdge * const edge)
+{
+	displayLine(desired_gc, edge->cross, edge->l1->p1);
+	displayLine(desired_gc, edge->cross, edge->l1->p2);
+	displayLine(desired_gc, edge->cross, edge->l2->p1);
+	displayLine(desired_gc, edge->cross, edge->l2->p2);
+}
+
+void displaySpanningTree(const GC desired_gc, const OutSpanningTreeEdge * const spanning_tree)
+{
+
+	const OutSpanningTreeEdge * t = spanning_tree;
+	while (t != NULL)
+	{
+		displaySpanningTreeEdge(desired_gc, t);
+		t = t->next;
+	}
+}
+
+void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2, const OutSpanningTreeEdge * const spanning_tree)
 {
 	while (1)
 	{
-		disspayLowerBoundApproximationCost(approximation1, approximation2, any_solution);
+		disspayLowerBoundApproximationCost(approximation1, approximation2, spanning_tree);
+
+//		displaySpanningTree(gc_red, spanning_tree);
+		drawMST(gc_red, approximation1);
+		drawMST(gc_red, approximation2);
 
 		drawLines(LineHorArray);
 		drawLines(LineVertArray);
-		drawMST(gc_red, approximation1);
-		drawMST(gc_yellow, approximation2);
+//		drawMST(gc_grey, approximation1);
+	// 	drawMST(gc_yellow, approximation2);
 
 		processEvents();
 	}
