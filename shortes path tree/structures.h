@@ -6,7 +6,9 @@
 #define min(a,b) ((a)<(b)?(a):(b))
 
 typedef struct LineStruct Line;
+
 typedef struct OutSpanningTreeEdgeStruct OutSpanningTreeEdge;
+typedef struct OutSpanningTreeStruct OutSpanningTree;
 typedef struct VertexStruct Vertex;
 typedef struct EdgeStruct Edge;
 
@@ -35,8 +37,13 @@ struct OutSpanningTreeEdgeStruct
 	Line *l1;
 	Line *l2;
 	Point cross;
+};
+
+struct OutSpanningTreeStruct
+{
+	OutSpanningTreeEdge * edges;
+	int edges_count;
 	int weight;
-	OutSpanningTreeEdge * next;
 };
 
 struct VertexStruct

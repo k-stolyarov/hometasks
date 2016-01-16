@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 	//scanf("%s", filename);
 	readInputLines(filename, &LineHorArray, & LineVertArray);
 
-	{
+	if (0) {
 		Line * l = LineHorArray;
 		int minx = 1000000;
 		int maxx = -100000;
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 	Edge * approximation1 = buildLowerBoundApproximationPart(LineHorArray, LineVertArray);
 	Edge * approximation2 = buildLowerBoundApproximationPart(LineVertArray, LineHorArray);
 
-	OutSpanningTreeEdge * spanning_tree = NULL;// = buildSpanningTree(LineHorArray, LineVertArray);
+	OutSpanningTree  spanning_tree = buildSpanningTree(LineHorArray, LineVertArray);
 
 	displayResults(LineHorArray, LineVertArray, approximation1, approximation2, spanning_tree);
 	return 0;

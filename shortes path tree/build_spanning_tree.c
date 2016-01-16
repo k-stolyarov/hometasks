@@ -100,7 +100,7 @@ Line * deduplicate(const Line * lines)
 	return deduplicated;
 }
 
-OutSpanningTreeEdge * buildSpanningTree(const Line * in_horizontal, const Line * in_vertical)
+OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_vertical)
 {
 	// remove linecuts that are on the same line.
 	Line * horizontal = deduplicate(in_horizontal);
@@ -111,6 +111,8 @@ OutSpanningTreeEdge * buildSpanningTree(const Line * in_horizontal, const Line *
 	// for every pair of linecuts append an edge that connect most distant edges of them.
 	const int v_size = linesCount(vertical);
 	const int h_size = linesCount(horizontal);
+	const int verticies_count = h_size + v_size;
+
 	SpanningTreeEdge * edges = calloc(h_size * v_size, sizeof(SpanningTreeEdge));
 	int current_edge = 0;
 
@@ -132,17 +134,38 @@ OutSpanningTreeEdge * buildSpanningTree(const Line * in_horizontal, const Line *
 	// sort edges by weight
 	qsort(edges, current_edge, sizeof(SpanningTreeEdge), &compareEdges);
 
-	// initially place every linecut in a separate connectivity component
-	const int verticies_count = h_size + v_size;
-	int * connected_components = calloc(verticies_count, sizeof(int));
+	// calculate lines lenths
 	int i = 0 ;
+	int * line_length = calloc(verticies_count, sizeof(int));
+	{
+		h = horizontal;
+		while (h != NULL) {
+			line_length[i]	 = distance(h->p1.x, h->p1.y, h->p2.x, h->p2.y);
+			h = h->next;
+			++i;
+		}
+		Line *v = vertical;
+
+		while (v != NULL) {
+			line_length[i]	 = distance(v->p1.x, v->p1.y, v->p2.x, v->p2.y);
+			++i;
+			v = v->next;
+		}
+	}
+
+	// initially place every linecut in a separate connectivity component
+
+	int * connected_components = calloc(verticies_count, sizeof(int));
+	int * lines_usage = calloc(verticies_count, sizeof(int));
+
 	for(i =0 ; i < h_size + v_size; ++i)
 	{
 		connected_components[i] = i;
 	}
 
 	// for every edge add this to a result if linecuts are in differeet components and merge this components.
-	OutSpanningTreeEdge * spanning_tree = calloc(h_size + v_size - 1, sizeof(OutSpanningTreeEdge));
+	OutSpanningTreeEdge * spanning_tree = calloc(verticies_count - 1, sizeof(OutSpanningTreeEdge));
+	int weight = 0;
 	int output_edge = 0;
 	for(i = 0 ; i< current_edge; ++i)
 	{
@@ -158,14 +181,30 @@ OutSpanningTreeEdge * buildSpanningTree(const Line * in_horizontal, const Line *
 					connected_components[j] = l2;
 				}
 			}
+			++lines_usage[edges[i].l1_index];
+			++lines_usage[edges[i].l2_index];
 			spanning_tree[output_edge].l1 = edges[i].l1;
 			spanning_tree[output_edge].l2 = edges[i].l2;
 			spanning_tree[output_edge].cross = edges[i].cross;
-			spanning_tree[output_edge].weight = edges[i].weight;
-			spanning_tree[output_edge].next = spanning_tree + output_edge + 1;
+			weight += edges[i].weight;
+
 			++output_edge;
 		}
 	}
-	spanning_tree[verticies_count - 2].next = NULL;
-	return spanning_tree;
+	// substract edges leegth that are counted several times
+	{
+		for(i = 0 ; i < verticies_count; ++i)
+		{
+			if(lines_usage[i] > 1)
+			{
+				weight -= (lines_usage[i]-1) * line_length[i];
+			}
+		}
+	}
+	OutSpanningTree result;
+	result.edges = spanning_tree;
+	result.edges_count = verticies_count - 1;
+	result.weight = weight;
+
+	return result;
 }
