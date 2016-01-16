@@ -6,35 +6,6 @@
 #include "structures.h"
 #include "ui.h"
 
-bool onSegment(int px, int py, int qx, int qy, int rx, int ry)
-{
-    if (qx <= max(px, rx) && qx >= min(px, rx) && qy <= max(py, ry) && qy >= min(py, ry))
-       return true;
-    return false;
-}
-
-int orientation(int px, int py, int qx, int qy, int rx, int ry)
-{
-    int val = (qy - py) * (rx - qx) - (qx - px) * (ry - qy);
-    if (val == 0) return 0;
-    return (val > 0)? 1: 2;
-}
-
-bool doIntersect(int p1x, int p1y, int q1x, int q1y, int p2x, int p2y, int q2x, int q2y)
-{
-    int o1 = orientation(p1x, p1y, q1x, q1y, p2x, p2y);
-    int o2 = orientation(p1x, p1y, q1x, q1y, q2x, q2y);
-    int o3 = orientation(p2x, p2y, q2x, q2y, p1x, p1y);
-    int o4 = orientation(p2x, p2y, q2x, q2y, q1x, q1y);
-    if (o1 != o2 && o3 != o4)
-        return true;
-    if (o1 == 0 && onSegment(p1x, p1y, p2x, p2y, q1x, q1y)) return true;
-    if (o2 == 0 && onSegment(p1x, p1y, q2x, q2y, q1x, q1y)) return true;
-    if (o3 == 0 && onSegment(p2x, p2y, p1x, p1y, q2x, q2y)) return true;
-    if (o4 == 0 && onSegment(p2x, p2y, q1x, q1y, q2x, q2y)) return true;
-    return false;
-}
-
 float getWeight(int x1, int y1, int x2, int y2)
 {
     int diffx = x1 - x2;
@@ -129,14 +100,14 @@ int main(int argc, char** argv)
 		Line *lineTmpV = LineVertArray;
 		while(lineTmpV != NULL)
 		{
-			if(doIntersect(lineTmpH->pointB, lineTmpH->pointA, lineTmpH->pointC, lineTmpH->pointA, lineTmpV->pointA, lineTmpV->pointB, lineTmpV->pointA, lineTmpV->pointC))
+			if(doIntersect(lineTmpH, lineTmpV))
 			{
 				printf("%d\n", p++);
 				vertex = malloc(sizeof(Vertex));
 				vertex->a = lineTmpV;
 				vertex->b = lineTmpH;
-				vertex->X = lineTmpV->pointA;
-				vertex->Y = lineTmpH->pointA;
+				vertex->X = lineTmpV->p1.x;
+				vertex->Y = lineTmpH->p1.y;
 				vertex->next = NULL;
 				vertex->edges = NULL;
 				if(!containsVertex(vertex, VertexArray))
