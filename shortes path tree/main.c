@@ -21,7 +21,8 @@ int main(int argc, char** argv)
 
 	Edge * approximation1 = buildApproximation(LineHorArray, LineVertArray);
 	Edge * approximation2 = buildApproximation(LineVertArray, LineHorArray);
+	Edge * any_solution = NULL;
 
-	displayResults(LineHorArray, LineVertArray, approximation1, approximation2);
+	displayResults(LineHorArray, LineVertArray, approximation1, approximation2, any_solution);
 	return 0;
 }

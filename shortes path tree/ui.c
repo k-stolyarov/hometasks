@@ -31,6 +31,7 @@ unsigned long valuemask = 0;
 XGCValues gc_values, gc_yellow_values, gc_red_values, gc_grey_values;
 Colormap color_map;
 XColor tmp_color1, tmp_color2;
+XFontStruct *fontInfo;
 
 void initializeWindow(int argc, char **argv, int xBound, int yBound)
 {
@@ -124,6 +125,12 @@ void initializeWindow(int argc, char **argv, int xBound, int yBound)
 	}
 	else
 		XSetForeground(display_ptr, gc_grey, tmp_color1.pixel);
+
+	if ( (fontInfo =  XLoadQueryFont(display_ptr, "*-courier-*" )) == NULL){
+	  printf("Font not found!\n");
+	  exit(1);
+	}
+	XSetFont (display_ptr, gc, fontInfo->fid);
 }
 
 void processEvents()
@@ -165,24 +172,50 @@ void drawLines(Line * const LineHorArray)
 	}
 }
 
-void drawMST(Edge * const MST)
+void drawMST(const GC desired_gc, Edge * const MST)
 {
 	Edge * mst = MST;
 	while (mst != NULL)
 	{
-		XDrawLine(display_ptr, win, gc_red, mst->src->X, mst->src->Y, mst->dst->X, mst->dst->Y);
+		XDrawLine(display_ptr, win, desired_gc, mst->src->X, mst->src->Y, mst->dst->X, mst->dst->Y);
 		mst = mst->next;
 	}
 }
 
-void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2)
+float edgesLength(Edge * const edges)
+{
+	float result = 0;
+	Edge * e = edges;
+	while(NULL != e)
+	{
+		result += e->weight;
+		e = e->next;
+	}
+	return result;
+}
+
+void disspayLowerBoundApproximationCost(Edge * const approximation1, Edge * const approximation2, Edge * const any_solution)
+{
+	const float lower_bound_length = edgesLength(approximation1) + edgesLength(approximation2);
+	const float solution_length = edgesLength(any_solution);
+	char buffer[512];
+	sprintf(buffer, "Lower bound: %0.0f", lower_bound_length);
+	XDrawString (display_ptr, win, gc, 10, 50, buffer, strlen (buffer) );
+	sprintf(buffer, "SuboptimalSolution: %0.0f", solution_length);
+	XDrawString (display_ptr, win, gc, 10, 100, buffer, strlen (buffer) );
+
+}
+
+void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2, Edge * const any_solution)
 {
 	while (1)
 	{
+		disspayLowerBoundApproximationCost(approximation1, approximation2, any_solution);
+
 		drawLines(LineHorArray);
 		drawLines(LineVertArray);
-		drawMST(approximation1);
-		drawMST(approximation2);
+		drawMST(gc_red, approximation1);
+		drawMST(gc_yellow, approximation2);
 
 		processEvents();
 	}
@@ -190,5 +223,5 @@ void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge 
 
 #else
 void initializeWindow(int argc, char **argv, int xBound, int yBound) {}
-void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2) {}
+void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2, Edge * const any_solution) {}
 #endif
