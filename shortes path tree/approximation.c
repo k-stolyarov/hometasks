@@ -3,11 +3,12 @@
 #include "approximation.h"
 #include "primMST.h"
 
-void appendEdge(Vertex * from, Vertex * to)
+void appendEdge(Vertex * from, Vertex * to, Line * cross_line)
 {
 	Edge *edge = malloc(sizeof(Edge));
 	edge->dst = to;
 	edge->src = from;
+	edge->cut = cross_line;
 	edge->weight = getDistance(from, to);
 	edge->included = false;
 
@@ -68,8 +69,8 @@ Edge * buildLowerBoundApproximationPart(Line * lines_verticies_form, Line * line
 				Line *cross_line = lines_intersects_verticies_lines;
 				while (cross_line != NULL) {
 					if (doIntersect(cross_line, VertexArray[i].b) && doIntersect(cross_line, VertexArray[j].b)) {
-						appendEdge(VertexArray + i, VertexArray + j);
-						appendEdge(VertexArray + j, VertexArray + i);
+						appendEdge(VertexArray + i, VertexArray + j, cross_line);
+						appendEdge(VertexArray + j, VertexArray + i, cross_line);
 					}
 					cross_line = cross_line->next;
 				}

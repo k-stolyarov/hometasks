@@ -44,7 +44,6 @@ Edge* primMST(Vertex *graph, Edge* current_forest_part)
 	Edge* mst = current_forest_part;
 	Vertex *graphTmp = graph;
 
-	int k = 0;
 	while(graphTmp != NULL)
 	{
 		if (graphTmp->isInAnyMST) {
@@ -63,6 +62,7 @@ Edge* primMST(Vertex *graph, Edge* current_forest_part)
 			tmpEdge->dst = edge->dst;
 			tmpEdge->weight = edge->weight;
 			tmpEdge->src = edge->src;
+			tmpEdge->cut = edge->cut;
 			tmpEdge->included = edge->included;
 			tmpEdge->next = edgesToCheck;
 			edgesToCheck = tmpEdge;
@@ -86,6 +86,7 @@ Edge* primMST(Vertex *graph, Edge* current_forest_part)
 		mstTemp->dst = edgeToAdd->dst;
 		mstTemp->weight = edgeToAdd->weight;
 		mstTemp->src = edgeToAdd->src;
+		mstTemp->cut = edgeToAdd->cut;
 		mstTemp->included = true;
 		mstTemp->next = mst;
 

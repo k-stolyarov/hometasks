@@ -7,6 +7,7 @@
 #include <X11/Xatom.h>
 
 #include "structures.h"
+#include "approximation.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -171,13 +172,21 @@ void drawLines(Line * const LineHorArray)
 		line = line->next;
 	}
 }
+void displayLine(const GC desired_gc, Point p1, Point p2);
+
+void drawEdge(const GC desired_gc, Edge * const edge)
+{
+	Point p1 = getCrossPoint(edge->dst->b, edge->cut);
+	Point p2 = getCrossPoint(edge->src->b, edge->cut);
+	displayLine(desired_gc, p1, p2);
+}
 
 void drawMST(const GC desired_gc, Edge * const MST)
 {
 	Edge * mst = MST;
 	while (mst != NULL)
 	{
-		XDrawLine(display_ptr, win, desired_gc, mst->src->X, mst->src->Y, mst->dst->X, mst->dst->Y);
+		drawEdge(desired_gc, mst);
 		mst = mst->next;
 	}
 }

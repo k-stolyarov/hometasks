@@ -56,6 +56,7 @@ struct EdgeStruct
 {
     Vertex *dst;
     Vertex *src;
+	Line * cut;
     Edge *next;
     int weight;
     int included;
