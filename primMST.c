@@ -3,6 +3,7 @@
 #include "structures.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "primMST.h"
 
 // function to check loops
 bool any(Edge *mst, Vertex *vertex)
