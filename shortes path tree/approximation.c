@@ -15,22 +15,6 @@ bool containsVertex(Vertex *vertex, Vertex *vertexArray)
 	return false;
 }
 
-bool containsEdge(Edge *edge, Vertex *vertexArray)
-{
-	Vertex *tmpVertex = vertexArray;
-	while (tmpVertex != NULL) {
-		Edge *currentEdge = tmpVertex->edges;
-		while (currentEdge != NULL) {
-			if (are_edges_equal(currentEdge, edge)) {
-				return true;
-			}
-			currentEdge = currentEdge->next;
-		}
-		tmpVertex = tmpVertex->next;
-	}
-	return false;
-}
-
 void appendEdge(Vertex * from, Vertex * to)
 {
 	Edge *edge = malloc(sizeof(Edge));
