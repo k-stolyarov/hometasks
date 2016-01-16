@@ -1,0 +1,4 @@
+gcc -c prims.c
+gcc -c main.c 
+
+gcc -o mst prims.o main.o -lX11 -lm -L/usr/X11R6/lib
