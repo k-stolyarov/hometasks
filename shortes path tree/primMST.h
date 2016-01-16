@@ -2,6 +2,7 @@
 #define __PRIM_MST_H_INCLUDED__
 
 #include "structures.h"
-Edge* primMST(Vertex *graph);
+// Construct Minnmal spating forest (in case of not connect graph)
+Edge* primMSF(Vertex *graph);
 
 #endif // #ifndef __PRIM_MST_H_INCLUDED__

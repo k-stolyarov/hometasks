@@ -37,13 +37,30 @@ void appendEdge(Vertex * from, Vertex * to)
 	edge->dst = from;
 	edge->src = to;
 	edge->weight = getDistance(from, to);
-	edge->next = NULL;
 	edge->included = false;
 
-	if (from->edges != NULL) {
-		edge->next = from->edges;
-	}
+	edge->next = from->edges;
 	from->edges = edge;
+}
+
+void fillEqualCoordinate(Point * rv, const Line * l)
+{
+	if (l->p1.x == l->p2.x)
+	{
+		rv->x = l->p1.x;
+	}
+	if (l->p1.y == l->p2.y)
+	{
+		rv->y = l->p1.y;
+	}
+}
+
+Point getCrossPoint(const Line * l1, const Line * l2)
+{
+	Point p;
+	fillEqualCoordinate(&p, l1);
+	fillEqualCoordinate(&p, l2);
+	return p;
 }
 
 Edge * buildApproximation(Line * lines_verticies_form, Line * lines_intersects_verticies_lines)
@@ -64,8 +81,9 @@ Edge * buildApproximation(Line * lines_verticies_form, Line * lines_intersects_v
 				vertex = malloc(sizeof(Vertex));
 				vertex->a = lineTmpIntersectsVertex;
 				vertex->b = lineTmpVertexOn;
-				vertex->X = lineTmpIntersectsVertex->p1.x;
-				vertex->Y = lineTmpVertexOn->p1.y;
+				Point p = getCrossPoint(lineTmpIntersectsVertex, lineTmpVertexOn);
+				vertex->X = p.x;
+				vertex->Y = p.y;
 				vertex->next = NULL;
 				vertex->edges = NULL;
 				if (containsVertex(vertex, VertexArray)) {
@@ -96,18 +114,12 @@ Edge * buildApproximation(Line * lines_verticies_form, Line * lines_intersects_v
 			if (tmpVertex->b == tmpNextVertex->b) {
 				appendEdge(tmpVertex, tmpNextVertex);
 				appendEdge(tmpNextVertex, tmpVertex);
-
-				if (containsEdge(tmpVertex->edges, VertexArray) || containsEdge(tmpNextVertex->edges, VertexArray))
-				{
-					printf("Something went wrong: duplicate edge.");
-					exit(-1);
-				}
 			}
 			tmpNextVertex = tmpNextVertex->next;
 		}
 		tmpVertex = tmpVertex->next;
 	}
 
-	Edge *mst = primMST(VertexArray);
+	Edge *mst = primMSF(VertexArray);
 	return mst;
 }

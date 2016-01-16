@@ -36,6 +36,7 @@ struct VertexStruct
     Vertex *next;
     Edge *edges;
     int edgeCount;
+	bool isInAnyMST;
 };
 bool are_verticies_equal(const Vertex * const v1, const Vertex * const v2);
 // calculate distance between two verticies.

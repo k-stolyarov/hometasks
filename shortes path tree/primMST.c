@@ -47,19 +47,24 @@ Edge* minWeightEdge(Edge *edges, Edge *mst)
 	return edge;
 }
 
-Edge* primMST(Vertex *graph)
+Edge* primMST(Vertex *graph, Edge* current_forest_part)
 {
 	Edge *edgesToCheck = NULL;
-	Edge* mst = NULL;
-	Vertex *graphTmp;
-	graphTmp = graph;
+	Edge* mst = current_forest_part;
+	Vertex *graphTmp = graph;
 	int d = 0;
 	int k = 0;
 	while(graphTmp != NULL)
 	{
+		if (graphTmp->isInAnyMST) {
+			printf("VErtex already in som MST. Something is wrong");
+			exit(-1);
+		}
+		graphTmp->isInAnyMST = true;
 		//add edges to edgesToCheck
 		Edge *edgeToAdd;
 		Edge *edge = graphTmp->edges;
+
 		//int i = graphTmp->edgeCount;
 
 		while(edge != NULL)
@@ -86,6 +91,12 @@ Edge* primMST(Vertex *graph)
 			edge = edge->next;
 			//i--;
 		}
+		if(NULL == edgesToCheck)
+		{
+			// no more edges
+			break;
+		}
+
 		//find min weight edge src edgesToCheck
 		edgeToAdd = minWeightEdge(edgesToCheck, mst);
 		printf("%d | src(%d;%d) dst(%d;%d) weight = %f included = %d\n", d++, edgeToAdd->src->X, edgeToAdd->src->Y, edgeToAdd->dst->X, edgeToAdd->dst->Y, edgeToAdd->weight, edgeToAdd->included);
@@ -116,4 +127,32 @@ Edge* primMST(Vertex *graph)
 		graphTmp = graphTmp->next;
 	}
 	return mst;
+}
+
+Edge* primMSF(Vertex *graph)
+{
+	Edge* current_forest_part = NULL;
+	{
+		Vertex *v = graph;
+		while(v != NULL)
+		{
+			v->isInAnyMST = false;
+			v = v->next;
+		}
+	}
+	{
+		Vertex *v = graph;
+		while(v != NULL)
+		{
+			current_forest_part = primMST(v, current_forest_part);
+			// find next vertex that does not belong to any MST and start
+			// construction of next tree in the forest with this vertex as start one.
+			while(v != NULL && v->isInAnyMST)
+			{
+				v = v->next;
+			}
+		}
+	}
+	return current_forest_part;
+
 }
