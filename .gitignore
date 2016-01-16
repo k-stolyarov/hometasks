@@ -1,1 +1,10 @@
 /shortest path tree
+/TSP/TSP/Debug/*.idb
+*.pdb
+*.sdf
+*.sln
+*.suo
+*.vcxproj
+*.filters
+*.user
+Debug
