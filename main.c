@@ -88,63 +88,45 @@ int main(int argc, char** argv)
 	char filename[255]="input";
 	printf("Enter file name: \n");
 	//scanf("%s", filename);
-	FILE *fr;
-	int pointB,pointC,p3;
-	char row[80];
-	char orient;
-	fr = fopen (filename, "rt");
-	Line *line;
+
 	int i = 0;
+
+	FILE *fr = fopen(filename, "rt");
+	char row[80];
+
 	while(fgets(row, 80, fr) != NULL)
 	{
+		Line *line;
+		char orient;
+		int pointB, pointC, p3;
 		sscanf (row, "%c %d, %d, %d", &orient, &pointB, &pointC, &p3);
-		line  = malloc(sizeof(Line));
-		if(orient == 'h')
-			line->orientation=0;
-		if(orient == 'v')
-			line->orientation=1;
-		line->pointA=pointB;
-		line->pointB=pointC;
-		line->pointC=p3;
+		line  = calloc(1, sizeof(Line));
 		line->next = NULL;
+		if (orient == 'h') {
+			line->pointA = pointB;
+			line->pointB = pointC;
+			line->pointC = p3;
 
-		if(line->orientation ==0)
-		{
-			if(LineHorArray == NULL)
-			{
-				LineHorArray = line;
-			}
-			else
-			{
-				line->next = LineHorArray;
-				LineHorArray = line;
-			}
-		}
-		else
-		{
-			if(LineVertArray == NULL)
-			{
-				LineVertArray = line;
-			}
-			else
-			{
-				line->next = LineVertArray;
-				LineVertArray = line;
-			}
+			append_line_to_list(line, &LineHorArray);
+		} else {
+			line->pointA = pointB;
+			line->pointB = pointC;
+			line->pointC = p3;
+
+			append_line_to_list(line, &LineVertArray);
 		}
 	}
 	///////build graph///////
 
 	// create array of all vertex
 	Edge *edge;
-	Line *lineTmpH = malloc(sizeof(Line));
-	Line *lineTmpV = malloc(sizeof(Line));
+	Line *lineTmpH = LineHorArray;
 	Vertex *vertex;
-	lineTmpH = LineHorArray;
-int p = 0;
+
+	int p = 0;
 	while(lineTmpH != NULL)
 	{
-		lineTmpV = LineVertArray;
+		Line *lineTmpV = LineVertArray;
 		while(lineTmpV != NULL)
 		{
 			if(doIntersect(lineTmpH->pointB, lineTmpH->pointA, lineTmpH->pointC, lineTmpH->pointA, lineTmpV->pointA, lineTmpV->pointB, lineTmpV->pointA, lineTmpV->pointC))

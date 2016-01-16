@@ -14,6 +14,8 @@ struct LineStruct
     Line* next;
 };
 
+void append_line_to_list( Line * const line_to_add, Line ** const list_head);
+
 struct VertexStruct
 {
     Line *a;
