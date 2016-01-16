@@ -54,5 +54,6 @@ struct EdgeStruct
 };
 
 bool are_edges_equal(const Edge * const e1, const Edge * const e2);
+Edge * joinEdgesLists(Edge * list1, Edge * list2);
 
 #endif // #ifndef __STRUCTURES_H_INCLUDED__

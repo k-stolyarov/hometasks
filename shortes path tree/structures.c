@@ -108,3 +108,16 @@ bool are_edges_equal(const Edge * const e1, const Edge * const e2)
 {
 	return e1->src == e2->src && e1->dst == e2->dst;
 }
+
+Edge * joinEdgesLists(Edge * list1, Edge * list2)
+{
+	Edge * result = list1;
+	while(list2 != NULL)
+	{
+		Edge* next = list2->next;
+		list2->next = result;
+		result = list2;
+		list2 = next;
+	}
+	return result;
+}
