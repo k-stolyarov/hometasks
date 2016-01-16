@@ -263,5 +263,5 @@ void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge 
 
 #else
 void initializeWindow(int argc, char **argv, int xBound, int yBound) {}
-void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2, Edge * const any_solution) {}
+void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2, const OutSpanningTreeEdge * const spanning_tree) {}
 #endif
