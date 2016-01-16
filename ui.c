@@ -163,21 +163,6 @@ void drawLines(Line * const LineHorArray)
 	}
 }
 
-void drawVerticies(Vertex * const VertexArray)
-{
-	Vertex *vertex = VertexArray;
-	while (vertex != NULL)
-	{
-		Edge *edge = vertex->edges;
-		while (edge != NULL)
-		{
-			XDrawLine(display_ptr, win, gc_grey, edge->src->X, edge->src->Y, edge->dst->X, edge->dst->Y);
-			edge = edge->next;
-		}
-		vertex = vertex->next;
-	}
-}
-
 void drawMST(Edge * const MST)
 {
 	Edge * mst = MST;
@@ -188,14 +173,14 @@ void drawMST(Edge * const MST)
 	}
 }
 
-void displayResults(Vertex * const VertexArray, Line * const LineHorArray, Line * const LineVertArray, Edge * const mst)
+void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2)
 {
 	while (1)
 	{
 		drawLines(LineHorArray);
 		drawLines(LineVertArray);
-		drawVerticies(VertexArray);
-		drawMST(MST);
+		drawMST(approximation1);
+		drawMST(approximation2);
 
 		processEvents();
 	}
@@ -203,5 +188,5 @@ void displayResults(Vertex * const VertexArray, Line * const LineHorArray, Line 
 
 #else
 void initializeWindow(int argc, char **argv, int xBound, int yBound) {}
-void displayResults(Vertex * const VertexArray, Line * const LineHorArray, Line * const LineVertArray, Edge * const mst) {}
+void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge * const approximation1, Edge * const approximation2) {}
 #endif
