@@ -6,16 +6,6 @@
 #include "structures.h"
 #include "ui.h"
 
-float getWeight(int x1, int y1, int x2, int y2)
-{
-    int diffx = x1 - x2;
-    int diffy = y1 - y2;
-    int diffx_sqr = pow(diffx,2);
-    int diffy_sqr = pow(diffy, 2);
-    float weight = sqrt(diffx_sqr + diffy_sqr);
-    return weight;
-}
-
 bool containsVertex(Vertex *vertex, Vertex *vertexArray)
 {
 	Vertex *tmpVertex = vertexArray;
@@ -121,7 +111,7 @@ int main(int argc, char** argv)
 					edge = malloc(sizeof(Edge));
 					edge->dst =  tmpNextVertex;
 					edge->src = tmpVertex;
-					edge->weight = getWeight(tmpVertex->X, tmpVertex->Y, tmpNextVertex->X, tmpNextVertex->Y);
+					edge->weight = getDistance(tmpVertex, tmpNextVertex);
 					edge->next = NULL;
 					edge->included = false;
 
@@ -141,7 +131,7 @@ int main(int argc, char** argv)
 					edge = malloc(sizeof(Edge));
 					edge->dst = tmpVertex;
 					edge->src = tmpNextVertex;
-					edge->weight = getWeight(tmpNextVertex->X, tmpNextVertex->Y, tmpVertex->X, tmpVertex->Y);
+					edge->weight = getDistance(tmpNextVertex, tmpVertex);
 					edge->next = NULL;
 					edge->included = false;
 

@@ -2,6 +2,7 @@
 #include "bool.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 void append_line_to_list(Line * const line_to_add, Line ** const list_head)
 {
@@ -78,3 +79,9 @@ void readInputLines(const char * const filename, Line ** const horizontal_lines,
 	}
 }
 
+float getDistance(const Vertex * const v1, const Vertex * const v2)
+{
+	int diffx = v1->X - v2->X;
+	int diffy = v1->Y - v2->Y;
+	return (float)(sqrt(diffx * diffx + diffy * diffy));
+}

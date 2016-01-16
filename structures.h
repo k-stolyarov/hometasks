@@ -35,6 +35,9 @@ struct VertexStruct
     int edgeCount;
 };
 
+// calculate distance between two verticies.
+float getDistance(const Vertex * const v1, const Vertex * const v2);
+
 struct EdgeStruct
 {
     Vertex *dst;
