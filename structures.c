@@ -79,9 +79,19 @@ void readInputLines(const char * const filename, Line ** const horizontal_lines,
 	}
 }
 
+bool are_verticies_equal(const Vertex * const v1, const Vertex * const v2)
+{
+	return (v1->a == v2->a && v1->b == v2->b) || (v1->a == v2->b && v1->b == v2->a);
+}
+
 float getDistance(const Vertex * const v1, const Vertex * const v2)
 {
 	int diffx = v1->X - v2->X;
 	int diffy = v1->Y - v2->Y;
 	return (float)(sqrt(diffx * diffx + diffy * diffy));
+}
+
+bool are_edges_equal(const Edge * const e1, const Edge * const e2)
+{
+	return e1->src == e2->src && e1->dst == e2->dst;
 }

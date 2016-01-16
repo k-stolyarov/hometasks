@@ -34,7 +34,7 @@ struct VertexStruct
     Edge *edges;
     int edgeCount;
 };
-
+bool are_verticies_equal(const Vertex * const v1, const Vertex * const v2);
 // calculate distance between two verticies.
 float getDistance(const Vertex * const v1, const Vertex * const v2);
 
@@ -46,5 +46,7 @@ struct EdgeStruct
     float weight;
     int included;
 };
+
+bool are_edges_equal(const Edge * const e1, const Edge * const e2);
 
 #endif // #ifndef __STRUCTURES_H_INCLUDED__
