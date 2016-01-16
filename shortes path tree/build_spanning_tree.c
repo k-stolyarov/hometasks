@@ -5,17 +5,6 @@
 #include <math.h>
 #include "approximation.h"
 
-int linesCount(const Line * l)
-{
-	int size = 0;
-	while(l != NULL)
-	{
-		++size;
-		l = l->next;
-	}
-	return size;
-}
-
 typedef struct SpanningTreeEdgeStruct SpanningTreeEdge;
 struct SpanningTreeEdgeStruct
 {

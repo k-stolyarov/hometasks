@@ -17,6 +17,17 @@ bool onSegment(int px, int py, int qx, int qy, int rx, int ry)
 	return false;
 }
 
+int linesCount(const Line * l)
+{
+	int size = 0;
+	while (l != NULL)
+	{
+		++size;
+		l = l->next;
+	}
+	return size;
+}
+
 int orientation(int px, int py, int qx, int qy, int rx, int ry)
 {
 	int val = (qy - py) * (rx - qx) - (qx - px) * (ry - qy);

@@ -28,6 +28,7 @@ void readInputLines(const char * const filename, Line ** const horizontal_lines,
 void append_line_to_list( Line * const line_to_add, Line ** const list_head);
 bool doIntersect(const Line * const l1, const Line * const l2);
 bool onSegment(int px, int py, int qx, int qy, int rx, int ry);
+int linesCount(const Line * l);
 
 struct OutSpanningTreeEdgeStruct
 {
