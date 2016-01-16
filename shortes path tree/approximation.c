@@ -34,9 +34,9 @@ bool containsEdge(Edge *edge, Vertex *vertexArray)
 void appendEdge(Vertex * from, Vertex * to)
 {
 	Edge *edge = malloc(sizeof(Edge));
-	edge->dst = from;
-	edge->src = to;
-	edge->weight = getDistance(from, to);
+	edge->dst = to;
+	edge->src = from;
+	edge->weight = getDistance(from, to) + getDistanceToLine(from, from->a) + getDistanceToLine(to, to->a) ;
 	edge->included = false;
 
 	edge->next = from->edges;
