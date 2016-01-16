@@ -41,6 +41,8 @@ struct VertexStruct
 bool are_verticies_equal(const Vertex * const v1, const Vertex * const v2);
 // calculate distance between two verticies.
 float getDistance(const Vertex * const v1, const Vertex * const v2);
+// Caaculate distance from vertex to a specific linecut.
+float getDistanceToLine(const Vertex * const v, const Line * const line);
 
 struct EdgeStruct
 {

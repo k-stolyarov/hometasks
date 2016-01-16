@@ -81,11 +81,27 @@ bool are_verticies_equal(const Vertex * const v1, const Vertex * const v2)
 	return (v1->a == v2->a && v1->b == v2->b) || (v1->a == v2->b && v1->b == v2->a);
 }
 
+float distance(const int x1, const int y1, const int x2, const int y2)
+{
+	const int diffx = x1 - x2;
+	const int diffy = y1 - y2;
+	return (float)(sqrt(diffx * diffx + diffy * diffy));
+}
+
 float getDistance(const Vertex * const v1, const Vertex * const v2)
 {
-	int diffx = v1->X - v2->X;
-	int diffy = v1->Y - v2->Y;
-	return (float)(sqrt(diffx * diffx + diffy * diffy));
+	return distance(v1->X, v1->Y, v2->X, v2->Y);
+}
+
+float getDistanceToLine(const Vertex * const v, const Line * const l)
+{
+	if (onSegment(l->p1.x, l->p1.y, v->X, v->Y,l->p2.x, l->p2.y))
+	{
+		return 0;
+	}
+	const float d1 = distance(v->X, v->Y, l->p1.x, l->p1.y);
+	const float d2 = distance(v->X, v->Y, l->p2.x, l->p2.y);
+	return min(d1, d2);
 }
 
 bool are_edges_equal(const Edge * const e1, const Edge * const e2)
