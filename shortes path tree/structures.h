@@ -2,6 +2,9 @@
 #define __STRUCTURES_H_INCLUDED__
 #include "bool.h"
 
+#define max(a,b) ((a)>(b)?(a):(b))
+#define min(a,b) ((a)<(b)?(a):(b))
+
 typedef struct LineStruct Line;
 typedef struct VertexStruct Vertex;
 typedef struct EdgeStruct Edge;

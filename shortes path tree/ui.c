@@ -7,6 +7,8 @@
 #include <X11/Xatom.h>
 
 #include "structures.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 Display *display_ptr;
 Screen *screen_ptr;
@@ -158,7 +160,7 @@ void drawLines(Line * const LineHorArray)
 	Line * line = LineHorArray;
 	while (line != NULL)
 	{
-		XDrawLine(display_ptr, win, gc, LineHorArray->pointB, LineHorArray->pointA, LineHorArray->pointC, LineHorArray->pointA);
+		XDrawLine(display_ptr, win, gc, line->p1.x, line->p1.y, line->p2.x, line->p2.y);
 		line = line->next;
 	}
 }
