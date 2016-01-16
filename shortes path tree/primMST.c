@@ -27,7 +27,7 @@ Edge* minWeightEdge(Edge *edges, Edge *mst)
 		// check minimum and not already in mst
 		if(!edges->included && (NULL == edge || edges->weight < edge->weight))
 		{
-			if(!any(mst, edges->src) || !any(mst, edges->dst))
+			if( !any(mst, edges->dst) )
 			{
 				edge = edges;
 			}
@@ -56,8 +56,6 @@ Edge* primMST(Vertex *graph, Edge* current_forest_part)
 		Edge *edgeToAdd;
 		Edge *edge = graphTmp->edges;
 
-		//int i = graphTmp->edgeCount;
-
 		while(edge != NULL)
 		{
 			Edge *tmpEdge;
@@ -66,21 +64,10 @@ Edge* primMST(Vertex *graph, Edge* current_forest_part)
 			tmpEdge->weight = edge->weight;
 			tmpEdge->src = edge->src;
 			tmpEdge->included = edge->included;
-			tmpEdge->next = NULL;
-
-			if (edgesToCheck== NULL)
-			{
-				edgesToCheck = tmpEdge;
-				edgesToCheck->next = NULL;
-			}
-			else
-			{
-				tmpEdge->next = edgesToCheck;
-				edgesToCheck = tmpEdge;
-			}
-
+			tmpEdge->next = edgesToCheck;
+			edgesToCheck = tmpEdge;
+			
 			edge = edge->next;
-			//i--;
 		}
 
 		//find min weight edge src edgesToCheck
@@ -94,7 +81,7 @@ Edge* primMST(Vertex *graph, Edge* current_forest_part)
 
 		// add min weight edge to mst
 		edgeToAdd->included = true;
-		printf("%d | src(%d;%d) dst(%d;%d) weight = %f included = %d\n", k++, edgeToAdd->src->X, edgeToAdd->src->Y, edgeToAdd->dst->X, edgeToAdd->dst->Y, edgeToAdd->weight, edgeToAdd->included);
+
 		Edge *mstTemp = malloc(sizeof(Edge));
 		mstTemp->dst = edgeToAdd->dst;
 		mstTemp->weight = edgeToAdd->weight;

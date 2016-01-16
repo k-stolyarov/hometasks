@@ -3,24 +3,12 @@
 #include "approximation.h"
 #include "primMST.h"
 
-bool containsVertex(Vertex *vertex, Vertex *vertexArray)
-{
-	Vertex *tmpVertex = vertexArray;
-	while (tmpVertex != NULL) {
-		if (are_verticies_equal(tmpVertex, vertex)) {
-			return true;
-		}
-		tmpVertex = tmpVertex->next;
-	}
-	return false;
-}
-
 void appendEdge(Vertex * from, Vertex * to)
 {
 	Edge *edge = malloc(sizeof(Edge));
 	edge->dst = to;
 	edge->src = from;
-	edge->weight = getDistance(from, to) + getDistanceToLine(from, from->a) + getDistanceToLine(to, to->a) ;
+	edge->weight = getDistance(from, to);
 	edge->included = false;
 
 	edge->next = from->edges;
@@ -52,56 +40,41 @@ Edge * buildLowerBoundApproximationPart(Line * lines_verticies_form, Line * line
 	///////build graph///////
 
 	// create array of all vertex
-	Vertex* VertexArray = NULL;
-	Line *lineTmpVertexOn = lines_verticies_form;
-	Vertex *vertex;
-
-	int p = 0;
-	while (lineTmpVertexOn != NULL) {
-		Line *lineTmpIntersectsVertex = lines_intersects_verticies_lines;
-		while (lineTmpIntersectsVertex != NULL) {
-			if (doIntersect(lineTmpVertexOn, lineTmpIntersectsVertex)) {
-				printf("%d\n", p++);
-				vertex = malloc(sizeof(Vertex));
-				vertex->a = lineTmpIntersectsVertex;
-				vertex->b = lineTmpVertexOn;
-				Point p = getCrossPoint(lineTmpIntersectsVertex, lineTmpVertexOn);
-				vertex->X = p.x;
-				vertex->Y = p.y;
-				vertex->next = NULL;
-				vertex->edges = NULL;
-				if (containsVertex(vertex, VertexArray)) {
-					printf("Something went wrong: duplicate vertex");
-					exit(-1);
-				}
-				if (VertexArray == NULL) {
-					VertexArray = vertex;
-				}
-				else {
-					vertex->next = VertexArray;
-					VertexArray = vertex;
-				}
+	
+	const int verticies_count = linesCount(lines_verticies_form);
+	Vertex* VertexArray = calloc(verticies_count, sizeof(Vertex));
+	{
+		// create verticies
+		Line * l = lines_verticies_form;
+		int i = 0;
+		while (l != NULL) {
+			VertexArray[i].b = l;
+			VertexArray[i].edges = NULL;
+			if (i + 1 < verticies_count) {
+				VertexArray[i].next = VertexArray + i + 1;
 			}
-			lineTmpIntersectsVertex = lineTmpIntersectsVertex->next;
+			++i;
+			l = l->next;
 		}
-		lineTmpVertexOn = lineTmpVertexOn->next;
 	}
-
-	// create edges
-	Vertex *tmpVertex;
-	tmpVertex = VertexArray;
-	Vertex *tmpNextVertex;
-	while (tmpVertex != NULL) {
-		tmpNextVertex = tmpVertex->next;
-		while (tmpNextVertex != NULL) {
-			// check if we can move from one vertex to another
-			if (tmpVertex->b == tmpNextVertex->b) {
-				appendEdge(tmpVertex, tmpNextVertex);
-				appendEdge(tmpNextVertex, tmpVertex);
+	{
+		// create edges
+		int i = 0;
+		int j = 0;
+		for (i = 0; i < verticies_count; ++i)
+		{
+			for (j = i + 1; j < verticies_count; ++j)
+			{
+				Line *cross_line = lines_intersects_verticies_lines;
+				while (cross_line != NULL) {
+					if (doIntersect(cross_line, VertexArray[i].b) && doIntersect(cross_line, VertexArray[j].b)) {
+						appendEdge(VertexArray + i, VertexArray + j);
+						appendEdge(VertexArray + j, VertexArray + i);
+					}
+					cross_line = cross_line->next;
+				}
 			}
-			tmpNextVertex = tmpNextVertex->next;
 		}
-		tmpVertex = tmpVertex->next;
 	}
 
 	Edge *mst = primMSF(VertexArray);

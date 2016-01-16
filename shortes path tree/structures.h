@@ -47,22 +47,20 @@ struct VertexStruct
 	bool isInAnyMST;
 	Vertex *next;
 };
-bool are_verticies_equal(const Vertex * const v1, const Vertex * const v2);
+
 // calculate distance between two verticies.
-float getDistance(const Vertex * const v1, const Vertex * const v2);
-// Caaculate distance from vertex to a specific linecut.
-float getDistanceToLine(const Vertex * const v, const Line * const line);
+int getDistance(const Vertex * const v1, const Vertex * const v2);
+
 
 struct EdgeStruct
 {
     Vertex *dst;
     Vertex *src;
     Edge *next;
-    float weight;
+    int weight;
     int included;
 };
 
-bool are_edges_equal(const Edge * const e1, const Edge * const e2);
 Edge * joinEdgesLists(Edge * list1, Edge * list2);
 
 #endif // #ifndef __STRUCTURES_H_INCLUDED__
