@@ -59,34 +59,8 @@ int main(int argc, char** argv)
 	char filename[255]="input";
 	printf("Enter file name: \n");
 	//scanf("%s", filename);
+	readInputLines(filename, &LineHorArray, & LineVertArray);
 
-	int i = 0;
-
-	FILE *fr = fopen(filename, "rt");
-	char row[80];
-
-	while(fgets(row, 80, fr) != NULL)
-	{
-		Line *line;
-		char orient;
-		int pointB, pointC, p3;
-		sscanf (row, "%c %d, %d, %d", &orient, &pointB, &pointC, &p3);
-		line  = calloc(1, sizeof(Line));
-		line->next = NULL;
-		if (orient == 'h') {
-			line->pointA = pointB;
-			line->pointB = pointC;
-			line->pointC = p3;
-
-			append_line_to_list(line, &LineHorArray);
-		} else {
-			line->pointA = pointB;
-			line->pointB = pointC;
-			line->pointC = p3;
-
-			append_line_to_list(line, &LineVertArray);
-		}
-	}
 	///////build graph///////
 
 	// create array of all vertex

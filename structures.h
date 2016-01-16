@@ -20,6 +20,7 @@ struct LineStruct
     Line* next;
 };
 
+void readInputLines(const char * const filename, Line ** const horizontal_lines, Line ** const vertical_lines);
 void append_line_to_list( Line * const line_to_add, Line ** const list_head);
 bool doIntersect(const Line * const l1, const Line * const l2);
 

@@ -45,3 +45,36 @@ bool doIntersect(const Line * const l1, const Line * const l2)
 {
 	return doIntersectCoords(l1->p1.x, l1->p1.y, l1->p2.x, l1->p2.y, l2->p1.x, l2->p1.y, l2->p2.x, l2->p2.y);
 }
+
+void readInputLines(const char * const filename, Line ** const horizontal_lines, Line ** const vertical_lines)
+{
+	FILE *fr = fopen(filename, "rt");
+	char row[80];
+
+	while (fgets(row, 80, fr) != NULL)
+	{
+		Line *line;
+		char orient;
+		int a, b, c;
+		sscanf(row, "%c %d, %d, %d", &orient, &a, &b, &c);
+		line = calloc(1, sizeof(Line));
+		line->next = NULL;
+		if (orient == 'h') {
+			line->p1.x = b;
+			line->p1.y = a;
+			line->p2.x = c;
+			line->p2.y = a;
+
+			append_line_to_list(line, horizontal_lines);
+		}
+		else {
+			line->p1.x = a;
+			line->p1.y = b;
+			line->p2.x = a;
+			line->p2.y = c;
+
+			append_line_to_list(line, horizontal_lines);
+		}
+	}
+}
+
