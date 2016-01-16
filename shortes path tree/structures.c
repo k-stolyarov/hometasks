@@ -6,10 +6,7 @@
 
 void append_line_to_list(Line * const line_to_add, Line ** const list_head)
 {
-	if (*list_head != NULL)
-	{
-		(*list_head)->next = line_to_add;
-	}
+	line_to_add->next = (*list_head);
 	*list_head = line_to_add;
 }
 
@@ -74,7 +71,7 @@ void readInputLines(const char * const filename, Line ** const horizontal_lines,
 			line->p2.x = a;
 			line->p2.y = c;
 
-			append_line_to_list(line, horizontal_lines);
+			append_line_to_list(line, vertical_lines);
 		}
 	}
 }
