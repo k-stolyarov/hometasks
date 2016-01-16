@@ -20,30 +20,21 @@ bool any(Edge *mst, Vertex *vertex)
 
 Edge* minWeightEdge(Edge *edges, Edge *mst)
 {	//6.7.21.22.23.36.40.41.42.44.
-	Edge *edge;
-	edge = edges;
-	Edge *tmp;
-	bool changed = false;
+	Edge *edge = NULL;
+
 	while(edges != NULL)
 	{
 		// check minimum and not already in mst
-		if(edges->weight < edge->weight && !edges->included)
+		if(!edges->included && (NULL == edge || edges->weight < edge->weight))
 		{
 			if(!any(mst, edges->src) || !any(mst, edges->dst))
 			{
 				edge = edges;
-				tmp = edges;
-				//changed = true;
 			}
 		}
 		edges = edges->next;
 	}
-	if(changed)
-	{
-		tmp->included = true;
-		edges = tmp;
-	}
-	edge->included = true;
+
 	return edge;
 }
 
@@ -52,7 +43,7 @@ Edge* primMST(Vertex *graph, Edge* current_forest_part)
 	Edge *edgesToCheck = NULL;
 	Edge* mst = current_forest_part;
 	Vertex *graphTmp = graph;
-	int d = 0;
+
 	int k = 0;
 	while(graphTmp != NULL)
 	{
@@ -91,40 +82,28 @@ Edge* primMST(Vertex *graph, Edge* current_forest_part)
 			edge = edge->next;
 			//i--;
 		}
-		if(NULL == edgesToCheck)
-		{
-			// no more edges
-			break;
-		}
 
 		//find min weight edge src edgesToCheck
 		edgeToAdd = minWeightEdge(edgesToCheck, mst);
-		printf("%d | src(%d;%d) dst(%d;%d) weight = %f included = %d\n", d++, edgeToAdd->src->X, edgeToAdd->src->Y, edgeToAdd->dst->X, edgeToAdd->dst->Y, edgeToAdd->weight, edgeToAdd->included);
+
+		if(edgeToAdd == NULL)
+		{
+			// no more edges to add
+			break;
+		}
 
 		// add min weight edge to mst
-		if(edgeToAdd->included)
-		{
-			printf("! %d | src(%d;%d) dst(%d;%d) weight = %f included = %d\n", k++, edgeToAdd->src->X, edgeToAdd->src->Y, edgeToAdd->dst->X, edgeToAdd->dst->Y, edgeToAdd->weight, edgeToAdd->included);
-			Edge *mstTemp = malloc(sizeof(Edge));
-			mstTemp->dst = edgeToAdd->dst;
-			mstTemp->weight = edgeToAdd->weight;
-			mstTemp->src = edgeToAdd->src;
-			mstTemp->included = true;
-			//mstTemp->next = NULL;
+		edgeToAdd->included = true;
+		printf("%d | src(%d;%d) dst(%d;%d) weight = %f included = %d\n", k++, edgeToAdd->src->X, edgeToAdd->src->Y, edgeToAdd->dst->X, edgeToAdd->dst->Y, edgeToAdd->weight, edgeToAdd->included);
+		Edge *mstTemp = malloc(sizeof(Edge));
+		mstTemp->dst = edgeToAdd->dst;
+		mstTemp->weight = edgeToAdd->weight;
+		mstTemp->src = edgeToAdd->src;
+		mstTemp->included = true;
+		mstTemp->next = mst;
 
-			if (mst== NULL)
-			{
-				mst = mstTemp;
-				mst->next = NULL;
-			}
-			else
-			{
-				mstTemp->next = mst;
-				mst = mstTemp;
-			}
-
-		}
-		graphTmp = graphTmp->next;
+		mst = mstTemp;
+		graphTmp = edgeToAdd->dst;
 	}
 	return mst;
 }
