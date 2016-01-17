@@ -59,60 +59,19 @@ void constructEdgeGeometry(SpanningTreeEdge * edge, const Line * h, const Line *
 	edge->weight = length;
 }
 
-Line * deduplicate(const Line * lines)
-{
-	Line * deduplicated = NULL;
-	const Line * l = lines;
-	while(l != NULL)
-	{
-		Line * existing = deduplicated;
-		while(existing != NULL)
-		{
-			if ((existing->p1.x == existing->p2.x && existing->p1.x == l->p1.x) ||
-				(existing->p1.y == existing->p2.y && existing->p1.y == l->p1.y))
-			{
-				break;
-			}
-			existing = existing->next;
-		}
-		if (NULL != existing)
-		{
-			existing->p1.x = min(existing->p1.x, l->p1.x);
-			existing->p1.x = min(existing->p1.x, l->p2.x);
-			existing->p1.y = min(existing->p1.y, l->p1.y);
-			existing->p1.y = min(existing->p1.y, l->p2.y);
-
-			existing->p2.x = max(existing->p2.x, l->p1.x);
-			existing->p2.x = max(existing->p2.x, l->p2.x);
-			existing->p2.y = max(existing->p2.y, l->p1.y);
-			existing->p2.y = max(existing->p2.y, l->p2.y);
-		}
-		else
-		{
-			// no element to update with ddpllcated coordinate. Append new one
-			existing = malloc(sizeof(Line));
-			existing->next = deduplicated;
-			deduplicated = existing;
-			existing->p1.x = min(l->p1.x, l->p2.x);
-			existing->p1.y = min(l->p1.y, l->p2.y);
-			existing->p2.x = max(l->p1.x, l->p2.x);
-			existing->p2.y = max(l->p1.y, l->p2.y);
-		}
-
-		l = l->next;
-	}
-	return deduplicated;
-}
-
 // append point to the line. New line contains previous line and apppnded point.
 Line * appendPointIntoLine(const Line * line, const Point p)
 {
 	Line *extended = malloc(sizeof(Line));
 	*extended = * line;
 	extended->p1.x = min(extended->p1.x, p.x);
+	extended->p1.x = min(extended->p2.x, extended->p1.x);
 	extended->p1.y = min(extended->p1.y, p.y);
+	extended->p1.y = min(extended->p2.y, extended->p1.y);
 	extended->p2.x = max(extended->p2.x, p.x);
+	extended->p2.x = max(extended->p2.x, extended->p1.x);
 	extended->p2.y = max(extended->p2.y, p.y);
+	extended->p2.y = max(extended->p2.y, extended->p1.y);
 	return extended;
 }
 
@@ -206,12 +165,8 @@ bool process_line_connecting_components(
 	return false;
 }
 
-OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_vertical)
+OutSpanningTree buildSpanningTree(const Line * horizontal, const Line * vertical)
 {
-	// remove linecuts that are on the same line.
-	Line * horizontal = deduplicate(in_horizontal);
-	Line * vertical = deduplicate(in_vertical);
-
 	const Line *h = horizontal;
 
 	// for every pair of linecuts append an edge that connect most distant edges of them.
