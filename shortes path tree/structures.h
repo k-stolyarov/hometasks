@@ -34,8 +34,8 @@ int linesCount(const Line * l);
 
 struct OutSpanningTreeEdgeStruct
 {
-	Line *l1;
-	Line *l2;
+	const Line *l1;
+	const Line *l2;
 	Point cross;
 };
 

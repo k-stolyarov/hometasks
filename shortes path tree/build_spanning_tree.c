@@ -8,9 +8,9 @@
 typedef struct SpanningTreeEdgeStruct SpanningTreeEdge;
 struct SpanningTreeEdgeStruct
 {
-	Line * l1;
+	const Line * l1;
 	int l1_index;
-	Line * l2;
+	const Line * l2;
 	int l2_index;
 	Point cross;
 
@@ -34,8 +34,7 @@ int distanceBetweenPoints(const Point p1, const Point p2)
 	return distance(p1.x, p1.y, p2.x, p2.y);
 }
 
-
-void constructEdgeGeometry(SpanningTreeEdge * edge, Line * h, Line * v)
+void constructEdgeGeometry(SpanningTreeEdge * edge, const Line * h, const Line * v)
 {
 	const Point p = getCrossPoint(h, v);
 	int length = 0;
@@ -139,7 +138,7 @@ bool process_line_connecting_components(
 	const int verticies_count,
 	bool * are_directly_connected,
 	int * directly_connected_components,
-	Line* * extended_lines, 
+	const Line* * extended_lines,
 	OutSpanningTreeEdge * spanning_tree,
 	int *output_edge,
 	int *weight)
@@ -213,7 +212,7 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 	Line * horizontal = deduplicate(in_horizontal);
 	Line * vertical = deduplicate(in_vertical);
 
-	Line *h = horizontal;
+	const Line *h = horizontal;
 
 	// for every pair of linecuts append an edge that connect most distant edges of them.
 	const int v_size = linesCount(vertical);
@@ -225,7 +224,7 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 
 	int h_index = 0;
 	while (h != NULL) {
-		Line *v = vertical;
+		const Line *v = vertical;
 		int v_index = 0;
 		while (v != NULL) {
 			constructEdgeGeometry(edges + current_edge, h, v);
@@ -245,19 +244,19 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 	// calculate lines lenths
 	int i = 0 ;
 	int * line_length = calloc(verticies_count, sizeof(int));
-	Line* * extended_lines = calloc(verticies_count, sizeof(Line*));
+	const Line* * extended_lines = calloc(verticies_count, sizeof(const Line*));
 	{
-		h = horizontal;
+		const Line * h = horizontal;
 		while (h != NULL) {
-			line_length[i]	 = distance(h->p1.x, h->p1.y, h->p2.x, h->p2.y);
+			line_length[i]	 = distanceBetweenPoints(h->p1, h->p2);
 			extended_lines[i] = h;
 			h = h->next;
 			++i;
 		}
-		Line *v = vertical;
+		const Line *v = vertical;
 
 		while (v != NULL) {
-			line_length[i]	 = distance(v->p1.x, v->p1.y, v->p2.x, v->p2.y);
+			line_length[i]	 = distanceBetweenPoints(v->p1, v->p2);
 			extended_lines[i] = v;
 			++i;
 			v = v->next;
