@@ -100,6 +100,35 @@ Line * deduplicate(const Line * lines)
 	return deduplicated;
 }
 
+// append point to the line. New line contains previous line and apppnded point.
+Line * appendPointIntoLine(const Line * line, const Point p)
+{
+	Line *extended = malloc(sizeof(Line));
+	*extended = * line;
+	extended->p1.x = min(extended->p1.x, p.x);
+	extended->p1.y = min(extended->p1.y, p.y);
+	extended->p2.x = max(extended->p2.x, p.x);
+	extended->p2.y = max(extended->p2.y, p.y);
+	return extended;
+}
+
+void mergeConnectedComponents(int * connected_components, const int verticies_count, const int index1, const int index2)
+{
+	const int l1 = connected_components[index1];
+	const int l2 = connected_components[index2];
+	if (l1 != l2)
+	{
+		int j = 0;
+
+		for(j = 0; j < verticies_count; ++j)
+		{
+			if (connected_components[j] == l1) {
+				connected_components[j] = l2;
+			}
+		}
+	}
+}
+
 OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_vertical)
 {
 	// remove linecuts that are on the same line.
@@ -125,6 +154,7 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 			edges[current_edge].l1_index = h_index;
 			edges[current_edge].l2_index = h_size + v_index;
 			++current_edge;
+
 			++v_index;
 			v = v->next;
 		}
@@ -137,10 +167,12 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 	// calculate lines lenths
 	int i = 0 ;
 	int * line_length = calloc(verticies_count, sizeof(int));
+	Line* * extended_lines = calloc(verticies_count, sizeof(Line*));
 	{
 		h = horizontal;
 		while (h != NULL) {
 			line_length[i]	 = distance(h->p1.x, h->p1.y, h->p2.x, h->p2.y);
+			extended_lines[i] = h;
 			h = h->next;
 			++i;
 		}
@@ -148,6 +180,7 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 
 		while (v != NULL) {
 			line_length[i]	 = distance(v->p1.x, v->p1.y, v->p2.x, v->p2.y);
+			extended_lines[i] = v;
 			++i;
 			v = v->next;
 		}
@@ -158,7 +191,7 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 	int * connected_components = calloc(verticies_count, sizeof(int));
 	int * lines_usage = calloc(verticies_count, sizeof(int));
 
-	for(i =0 ; i < h_size + v_size; ++i)
+	for(i =0 ; i < verticies_count; ++i)
 	{
 		connected_components[i] = i;
 	}
@@ -173,16 +206,33 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 		const int l2 = connected_components[edges[i].l2_index];
 		if (l1 != l2)
 		{
-			int j = 0;
-
-			for(j = 0; j < h_size + v_size; ++j)
-			{
-				if (connected_components[j] == l1) {
-					connected_components[j] = l2;
-				}
-			}
+			mergeConnectedComponents(connected_components, verticies_count, edges[i].l1_index, edges[i].l2_index);
 			++lines_usage[edges[i].l1_index];
 			++lines_usage[edges[i].l2_index];
+			{
+				// for each of existing lines if it intersects with the extended one -> merge connected components
+				Line *extended = appendPointIntoLine(edges[i].l1, edges[i].cross);
+				int k =0 ;
+				for(k =0 ; k < verticies_count;++k)
+				{
+					if (connected_components[k] != connected_components[edges[i].l1_index] && doIntersect(extended, extended_lines[k]))
+					{
+						mergeConnectedComponents(connected_components, verticies_count, edges[i].l1_index, k);
+					}
+				}
+				extended_lines[edges[i].l1_index] = extended;
+
+				extended = appendPointIntoLine(edges[i].l2, edges[i].cross);
+
+				for(k =0 ; k < verticies_count;++k)
+				{
+					if (connected_components[k] != connected_components[edges[i].l2_index] && doIntersect(extended, extended_lines[k]))
+					{
+						mergeConnectedComponents(connected_components, verticies_count, edges[i].l2_index, k);
+					}
+				}
+				extended_lines[edges[i].l2_index] = extended;
+			}
 			spanning_tree[output_edge].l1 = edges[i].l1;
 			spanning_tree[output_edge].l2 = edges[i].l2;
 			spanning_tree[output_edge].cross = edges[i].cross;
@@ -203,7 +253,7 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 	}
 	OutSpanningTree result;
 	result.edges = spanning_tree;
-	result.edges_count = verticies_count - 1;
+	result.edges_count = output_edge;
 	result.weight = weight;
 
 	return result;
