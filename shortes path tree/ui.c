@@ -27,9 +27,9 @@ XTextProperty win_name, icon_name;
 char *win_name_string = "MST";
 char *icon_name_string = "Icon for Example Window";
 XEvent report;
-GC gc, gc_yellow, gc_red, gc_grey;
+GC gc_black, gc_blue, gc_red, gc_green;
 unsigned long valuemask = 0;
-XGCValues gc_values, gc_yellow_values, gc_red_values, gc_grey_values;
+XGCValues gc_values, gc_blue_values, gc_red_values, gc_green_values;
 Colormap color_map;
 XColor tmp_color1, tmp_color2;
 XFontStruct *fontInfo;
@@ -96,22 +96,22 @@ void initializeWindow(int argc, char **argv, int xBound, int yBound)
 	XFlush(display_ptr);
 
 	/* create graphics context, so that we may draw in this window */
-	gc = XCreateGC(display_ptr, win, valuemask, &gc_values);
-	XSetForeground(display_ptr, gc, BlackPixel(display_ptr, screen_num));
-	XSetLineAttributes(display_ptr, gc, 3, LineSolid, CapRound, JoinRound);
+	gc_black = XCreateGC(display_ptr, win, valuemask, &gc_values);
+	XSetForeground(display_ptr, gc_black, BlackPixel(display_ptr, screen_num));
+	XSetLineAttributes(display_ptr, gc_black, 5, LineSolid, CapRound, JoinRound);
 	/* and three other graphics contexts, to draw in yellow and red and grey*/
-	gc_yellow = XCreateGC(display_ptr, win, valuemask, &gc_yellow_values);
-	XSetLineAttributes(display_ptr, gc_yellow, 1
+	gc_blue = XCreateGC(display_ptr, win, valuemask, &gc_blue_values);
+	XSetLineAttributes(display_ptr, gc_blue, 1
 					   , LineSolid, CapRound, JoinRound);
-	if (XAllocNamedColor(display_ptr, color_map, "yellow",
+	if (XAllocNamedColor(display_ptr, color_map, "blue",
 		&tmp_color1, &tmp_color2) == 0)
 	{
-		printf("failed to get color yellow\n"); exit(-1);
+		printf("failed to get color blue\n"); exit(-1);
 	}
 	else
-		XSetForeground(display_ptr, gc_yellow, tmp_color1.pixel);
+		XSetForeground(display_ptr, gc_blue, tmp_color1.pixel);
 	gc_red = XCreateGC(display_ptr, win, valuemask, &gc_red_values);
-	XSetLineAttributes(display_ptr, gc_red, 5, LineSolid, CapRound, JoinRound);
+	XSetLineAttributes(display_ptr, gc_red, 3, LineSolid, CapRound, JoinRound);
 	if (XAllocNamedColor(display_ptr, color_map, "red",
 		&tmp_color1, &tmp_color2) == 0)
 	{
@@ -119,20 +119,20 @@ void initializeWindow(int argc, char **argv, int xBound, int yBound)
 	}
 	else
 		XSetForeground(display_ptr, gc_red, tmp_color1.pixel);
-	gc_grey = XCreateGC(display_ptr, win, valuemask, &gc_grey_values);
-	if (XAllocNamedColor(display_ptr, color_map, "light grey",
+	gc_green = XCreateGC(display_ptr, win, valuemask, &gc_green_values);
+	if (XAllocNamedColor(display_ptr, color_map, "green",
 		&tmp_color1, &tmp_color2) == 0)
 	{
-		printf("failed to get color grey\n"); exit(-1);
+		printf("failed to get color green\n"); exit(-1);
 	}
 	else
-		XSetForeground(display_ptr, gc_grey, tmp_color1.pixel);
+		XSetForeground(display_ptr, gc_green, tmp_color1.pixel);
 
 	if ( (fontInfo =  XLoadQueryFont(display_ptr, "*-courier-*" )) == NULL){
 	  printf("Font not found!\n");
 	  exit(1);
 	}
-	XSetFont (display_ptr, gc, fontInfo->fid);
+	XSetFont (display_ptr, gc_black, fontInfo->fid);
 }
 
 void processEvents()
@@ -164,16 +164,17 @@ void processEvents()
 	}
 }
 
-void drawLines(Line * const LineHorArray)
+void displayLine(const GC desired_gc, Point p1, Point p2);
+
+void drawLines(const GC desired_gc, Line * const LineHorArray)
 {
 	Line * line = LineHorArray;
 	while (line != NULL)
 	{
-		XDrawLine(display_ptr, win, gc, line->p1.x, line->p1.y, line->p2.x, line->p2.y);
+		displayLine(desired_gc, line->p1, line->p2);
 		line = line->next;
 	}
 }
-void displayLine(const GC desired_gc, Point p1, Point p2);
 
 void drawEdge(const GC desired_gc, Edge * const edge)
 {
@@ -209,15 +210,17 @@ void disspayLowerBoundApproximationCost(Edge * const approximation1, Edge * cons
 	const float lower_bound_length = edgesLength(approximation1) + edgesLength(approximation2);
 	char buffer[512];
 	sprintf(buffer, "Lower bound: %0.0f", lower_bound_length);
-	XDrawString (display_ptr, win, gc, 10, 50, buffer, strlen (buffer) );
+	XDrawString (display_ptr, win, gc_black, 10, 30, buffer, strlen (buffer) );
 	sprintf(buffer, "SuboptimalSolution: %d", spanning_tree.weight);
-	XDrawString (display_ptr, win, gc, 10, 100, buffer, strlen (buffer) );
+	XDrawString (display_ptr, win, gc_black, 10, 60, buffer, strlen (buffer) );
 
 }
 
 void displayLine(const GC desired_gc, Point p1, Point p2)
 {
-	XDrawLine(display_ptr, win, desired_gc, p1.x, p1.y, p2.x, p2.y);
+	const int y_offset = 100;
+	XDrawLine(display_ptr, win, desired_gc, p1.x, p1.y + y_offset, p2.x, p2.y + y_offset
+			  );
 }
 
 void displaySpanningTreeEdge(const GC desired_gc, const OutSpanningTreeEdge * const edge)
@@ -243,14 +246,12 @@ void displayResults(Line * const LineHorArray, Line * const LineVertArray, Edge 
 	{
 		disspayLowerBoundApproximationCost(approximation1, approximation2, spanning_tree);
 
-//		displaySpanningTree(gc_red, spanning_tree);
-		drawMST(gc_red, approximation1);
-		drawMST(gc_red, approximation2);
 
-		drawLines(LineHorArray);
-		drawLines(LineVertArray);
-//		drawMST(gc_grey, approximation1);
-	// 	drawMST(gc_yellow, approximation2);
+		drawLines(gc_black, LineHorArray);
+		drawLines(gc_black, LineVertArray);
+		displaySpanningTree(gc_red, spanning_tree);
+		drawMST(gc_green, approximation1);
+		drawMST(gc_blue, approximation2);
 
 		processEvents();
 	}
