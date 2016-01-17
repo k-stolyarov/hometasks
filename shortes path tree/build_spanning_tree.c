@@ -22,11 +22,16 @@ int compareEdges (const void * a, const void * b)
 	return ((SpanningTreeEdge*)a)->weight - ((SpanningTreeEdge*)b)->weight;
 }
 
-static int distance(const int x1, const int y1, const int x2, const int y2)
+int distance(const int x1, const int y1, const int x2, const int y2)
 {
 	const int diffx = x1 - x2;
 	const int diffy = y1 - y2;
 	return (int)(sqrt(diffx * diffx + diffy * diffy));
+}
+
+int distanceBetweenPoints(const Point p1, const Point p2)
+{
+	return distance(p1.x, p1.y, p2.x, p2.y);
 }
 
 
@@ -127,6 +132,79 @@ void mergeConnectedComponents(int * connected_components, const int verticies_co
 			}
 		}
 	}
+}
+
+bool process_line_connecting_components(
+	int i,
+	const int verticies_count,
+	bool * are_directly_connected,
+	int * directly_connected_components,
+	Line* * extended_lines, 
+	OutSpanningTreeEdge * spanning_tree,
+	int *output_edge,
+	int *weight)
+{
+	int min_edge_j = -1;
+	int min_edge_k = -1;
+	int min_edge_length = 0xFFFFFFFF;
+	Line min_edge_line;
+
+	int j = 0;
+	for (j = 0; j < verticies_count; ++j)
+	{
+		if (are_directly_connected[j] && doIntersect(extended_lines[i], extended_lines[j]))
+		{
+			// line 'i' intersect some line 'j' from some tree.
+			const Point p_j = getCrossPoint(extended_lines[j], extended_lines[i]);
+			int k = 0;
+			for (k = 0; k < verticies_count; ++k)
+			{
+				if (are_directly_connected[k] &&
+					directly_connected_components[j] != directly_connected_components[k] &&
+					doIntersect(extended_lines[i], extended_lines[k]))
+				{
+					// line 'i' intersect some line 'k' from another tree.
+					const Point p_k = getCrossPoint(extended_lines[k], extended_lines[i]);
+					const int edge_length = distanceBetweenPoints(p_k, p_j);
+
+					if (edge_length < min_edge_length)
+					{
+						min_edge_j = j;
+						min_edge_k = k;
+						min_edge_length = edge_length;
+						min_edge_line.p1 = p_j;
+						min_edge_line.p1 = p_k;
+					}
+				}
+			}
+		}
+	}
+	if (min_edge_j != -1)
+	{
+		//Connect i and j components.
+		//mark components as equal
+		mergeConnectedComponents(directly_connected_components, verticies_count, min_edge_j, i);
+		mergeConnectedComponents(directly_connected_components, verticies_count, min_edge_k, i);
+
+		// to perform connection with one line two edges required: ij and ik
+		Line * clipped_i_line = calloc(1, sizeof(Line));
+		*clipped_i_line = min_edge_line;
+
+		spanning_tree[*output_edge].l1 = extended_lines[min_edge_j];
+		spanning_tree[*output_edge].l2 = clipped_i_line;
+		spanning_tree[*output_edge].cross = min_edge_line.p1;
+		++(*output_edge);
+
+		spanning_tree[*output_edge].l1 = extended_lines[min_edge_k];
+		spanning_tree[*output_edge].l2 = clipped_i_line;
+		spanning_tree[*output_edge].cross = min_edge_line.p2;
+		++(*output_edge);
+
+		*weight += min_edge_length;
+		// possibly needed to add some more edge from the original one.
+		return true;
+	}
+	return false;
 }
 
 OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_vertical)
@@ -261,6 +339,17 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 		}
 	}
 
+	// substract edges length that are counted several times
+	{
+		for (i = 0; i < verticies_count; ++i)
+		{
+			if (lines_usage[i] > 1)
+			{
+				weight -= (lines_usage[i] - 1) * line_length[i];
+			}
+		}
+	}
+
 	// Now we have batch of trees that are indireclty connected. Connect them.
 	// for each pair of trees exists an original line that connect them.
 
@@ -271,66 +360,11 @@ OutSpanningTree buildSpanningTree(const Line * in_horizontal, const Line * in_ve
 			 // this line already present in some tree.
 			continue;
 		}
-		int j =0 ;
-		for(j = 0 ; j < verticies_count; ++j)
+		while (process_line_connecting_components(i, verticies_count, are_directly_connected, directly_connected_components, extended_lines,spanning_tree, &output_edge, &weight))
 		{
-			if (are_directly_connected[j] && doIntersect(extended_lines[i], extended_lines[j]))
-			{
-				// line 'i' intersect some line 'j' from some tree.
-				int k =0 ;
-				for(k = 0 ; k < verticies_count; ++k)
-				{
-					if (are_directly_connected[k] &&
-						directly_connected_components[j] != directly_connected_components[k] &&
-						doIntersect(extended_lines[i], extended_lines[k]))
-					{
-						// line 'i' intersect some line 'k' from another tree.
-
-						//Connect them!
-						mergeConnectedComponents(directly_connected_components, verticies_count, j, i);
-						mergeConnectedComponents(directly_connected_components, verticies_count, k, i);
-						are_directly_connected[i] = true;
-
-
-						// to perform connection with one line two edges required: ij and ik
-						SpanningTreeEdge edge;
-						constructEdgeGeometry(&edge, extended_lines[i], extended_lines[j]);
-
-						spanning_tree[output_edge].l1 = edge.l1;
-						spanning_tree[output_edge].l2 = edge.l2;
-						spanning_tree[output_edge].cross = edge.cross;
-						weight += edge.weight;
-						++lines_usage[j];
-						++lines_usage[i];
-
-						++output_edge;
-
-						constructEdgeGeometry(&edge, extended_lines[i], extended_lines[k]);
-
-						spanning_tree[output_edge].l1 = edge.l1;
-						spanning_tree[output_edge].l2 = edge.l2;
-						spanning_tree[output_edge].cross = edge.cross;
-						weight += edge.weight;
-						++lines_usage[k];
-						++lines_usage[i];
-
-						++output_edge;
-					}
-				}
-			}
 		}
 	}
 
-	// substract edges leegth that are counted several times
-	{
-		for(i = 0 ; i < verticies_count; ++i)
-		{
-			if(lines_usage[i] > 1)
-			{
-				weight -= (lines_usage[i]-1) * line_length[i];
-			}
-		}
-	}
 	OutSpanningTree result;
 	result.edges = spanning_tree;
 	result.edges_count = output_edge;
