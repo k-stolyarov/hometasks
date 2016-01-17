@@ -104,7 +104,7 @@ bool process_line_connecting_components(
 {
 	int min_edge_j = -1;
 	int min_edge_k = -1;
-	int min_edge_length = 0xFFFFFFFF;
+	int min_edge_length = 0x7FFFFFFF;
 	Line min_edge_line;
 
 	int j = 0;
@@ -131,7 +131,7 @@ bool process_line_connecting_components(
 						min_edge_k = k;
 						min_edge_length = edge_length;
 						min_edge_line.p1 = p_j;
-						min_edge_line.p1 = p_k;
+						min_edge_line.p2 = p_k;
 					}
 				}
 			}
