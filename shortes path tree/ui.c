@@ -1,6 +1,6 @@
 #include "ui.h"
 
-#if 0
+#if 1
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
@@ -32,7 +32,7 @@ unsigned long valuemask = 0;
 XGCValues gc_values, gc_blue_values, gc_red_values, gc_green_values;
 Colormap color_map;
 XColor tmp_color1, tmp_color2;
-XFontStruct *fontInfo;
+//XFontStruct *fontInfo;
 
 void initializeWindow(int argc, char **argv, int xBound, int yBound)
 {
@@ -128,11 +128,11 @@ void initializeWindow(int argc, char **argv, int xBound, int yBound)
 	else
 		XSetForeground(display_ptr, gc_green, tmp_color1.pixel);
 
-	if ( (fontInfo =  XLoadQueryFont(display_ptr, "*-courier-*" )) == NULL){
-	  printf("Font not found!\n");
-	  exit(1);
-	}
-	XSetFont (display_ptr, gc_black, fontInfo->fid);
+	//if ( (fontInfo =  XLoadQueryFont(display_ptr, "*-courier-*" )) == NULL){
+	//  printf("Font not found!\n");
+	//  exit(1);
+	//}
+	//XSetFont (display_ptr, gc_black, fontInfo->fid);
 }
 
 void processEvents()
@@ -208,11 +208,12 @@ float edgesLength(Edge * const edges)
 void disspayLowerBoundApproximationCost(Edge * const approximation1, Edge * const approximation2, const OutSpanningTree spanning_tree)
 {
 	const float lower_bound_length = edgesLength(approximation1) + edgesLength(approximation2);
-	char buffer[512];
-	sprintf(buffer, "Lower bound: %0.0f", lower_bound_length);
-	XDrawString (display_ptr, win, gc_black, 10, 30, buffer, strlen (buffer) );
-	sprintf(buffer, "SuboptimalSolution: %d", spanning_tree.weight);
-	XDrawString (display_ptr, win, gc_black, 10, 60, buffer, strlen (buffer) );
+//	char buffer[512];
+	printf("Lower bound: %0.0f\n", lower_bound_length);
+//	XDrawString (display_ptr, win, gc_black, 10, 30, buffer, strlen (buffer) );
+	printf("SuboptimalSolution: %d\n", spanning_tree.weight);
+	printf("Costs Ration: %f\n", (lower_bound_length / spanning_tree.weight));
+//	XDrawString (display_ptr, win, gc_black, 10, 60, buffer, strlen (buffer) );
 
 }
 

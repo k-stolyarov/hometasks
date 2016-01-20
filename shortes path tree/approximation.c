@@ -58,6 +58,7 @@ Edge * buildLowerBoundApproximationPart(Line * lines_verticies_form, Line * line
 			l = l->next;
 		}
 	}
+	printf("Verticies for lower bound approximation are built\n");
 	{
 		// create edges
 		int i = 0;
@@ -77,7 +78,9 @@ Edge * buildLowerBoundApproximationPart(Line * lines_verticies_form, Line * line
 			}
 		}
 	}
+	printf("Edges for lower bound approximation are built\n");
 
 	Edge *mst = primMSF(VertexArray);
+	printf("MST creation is finished\n");
 	return mst;
 }

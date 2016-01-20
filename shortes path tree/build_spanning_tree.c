@@ -193,6 +193,7 @@ OutSpanningTree buildSpanningTree(const Line * horizontal, const Line * vertical
 		h = h->next;
 		++h_index;
 	}
+	printf("Created edges for spanning tree construction");
 	// sort edges by weight
 	qsort(edges, current_edge, sizeof(SpanningTreeEdge), &compareEdges);
 
@@ -217,6 +218,7 @@ OutSpanningTree buildSpanningTree(const Line * horizontal, const Line * vertical
 			v = v->next;
 		}
 	}
+	printf("calculated lengthes of all input lines\n");
 
 	// initially place every linecut in a separate connectivity component
 
@@ -292,6 +294,7 @@ OutSpanningTree buildSpanningTree(const Line * horizontal, const Line * vertical
 			++output_edge;
 		}
 	}
+	printf("Finished construction of spanning forest each component of each connected with some other by inut line\n");
 
 	// substract edges length that are counted several times
 	{
@@ -318,6 +321,8 @@ OutSpanningTree buildSpanningTree(const Line * horizontal, const Line * vertical
 		{
 		}
 	}
+	
+	printf("Joined spanning forest's trees into one tree\n");
 
 	OutSpanningTree result;
 	result.edges = spanning_tree;
