@@ -6,6 +6,7 @@
 
 #include "clear_terminal_window.h"
 #include "get_input_char.h"
+#include "text_coloring.h"
 
 using namespace std;
 
@@ -81,22 +82,6 @@ void playTime(minesweeper& play) {
 void viewStatistics() {
     cout << "Currently Not Supported \n" << endl;
 }
-
-const char * NORMAL_TEXT = "\x1B[0m";
-const char * BOLD_RED_TEXT = "\x1B[1;31m";
-const char * BOLD_BRIGHT_RED_TEXT = "\x1B[38;5;09m";
-const char * BOLD_GREEN_TEXT = "\x1B[1;32m";
-const char * BOLD_BRIGHT_GREEN_TEXT = "\x1B[38;5;0Am";
-const char * BOLD_YELLOW_TEXT = "\x1B[1;33m";
-const char * BOLD_BRIGHT_YELLOW_TEXT = "\x1B[38;5;0Bm";
-const char * BOLD_BLUE_TEXT = "\x1B[1;34m";
-const char * BOLD_BRIGHT_BLUE_TEXT = "\x1B[38;5;0Cm";
-const char * BOLD_MAGENTA_TEXT = "\x1B[1;35m";
-const char * BOLD_BRIGHT_MAGENTA_TEXT = "\x1B[38;5;0Dm";
-const char * BOLD_CYAN_TEXT = "\x1B[1;36m";
-const char * BOLD_BRIGHT_CYAN_TEXT = "\x1B[38;5;0Em";
-const char * BOLD_WHITE_TEXT = "\x1B[1;37m";
-const char * BOLD_BRIGHT_WHITE_TEXT = "\x1B[38;5;0Fm";
 
 const char exit_action_key = 'q';
 const char start_game_action_key = 'n';
