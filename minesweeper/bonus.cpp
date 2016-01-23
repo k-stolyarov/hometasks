@@ -24,7 +24,7 @@ int bonus::saveStatistics(std::string path)
 	return 0;
 }
 
-int loadStatistics(std::string path)
+int bonus::loadStatistics(std::string path)
 {
 	return 0;
 }
