@@ -1,9 +1,9 @@
-#include "clear_screen.h"
+#include "clear_terminal_window.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #include <windows.h>
 
-void clear_screen()
+void clear_terminal_window()
 {
 	HANDLE                     hStdOut;
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -40,10 +40,10 @@ void clear_screen()
 	SetConsoleCursorPosition(hStdOut, homeCoords);
 }
 #else // linux, mac
-#include <unistd.h>
 #include <term.h>
+#include <unistd.h>
 
-void clear_screen()
+void clear_terminal_window()
 {
 	if (!cur_term)
 	{
