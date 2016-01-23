@@ -207,6 +207,7 @@ bool process_game_action(
 		numberOfMines = std::min(rows * columns - 1, std::max(1, numberOfMines));
 
 		ms = bonus(columns, rows, numberOfMines);
+		ms.loadStatistics(statistics_file_name);
 		cursor.x = cursor.y = 0;
 		break;
 	}
