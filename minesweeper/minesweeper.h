@@ -13,6 +13,7 @@ using namespace std;
 
 // Extended support of fetching "isMarked" flag for a tile. For better UI.
 #define MINESWEEPER_IS_MARKED_SUPPORTED
+#define MINESWEEPER_DEBUG_MODE_SUPPORTED
 
 class minesweeper {
 private:
@@ -68,6 +69,9 @@ public:
 #endif // #ifdef MINESWEEPER_IS_MARKED_SUPPORTED
 	void markLocation(int x, int y);                // mark a cell as potential mine, the right click action	
 	int valueOf(int x, int y);                      //Returns tile value (# of surrounding mines if not mine)
+#ifdef MINESWEEPER_DEBUG_MODE_SUPPORTED
+	int debugModeValueOf(int x, int y);                      //Returns tile value (# of surrounding mines if not mine)
+#endif MINESWEEPER_DEBUG_MODE_SUPPORTED
 };
 
 

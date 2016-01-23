@@ -52,11 +52,11 @@ void minesweeper::calculateSurrounding(int x, int y) {
 	field_[y][x].surrounding_mines_count = -1;
 	
 	// iterate over 3x3 tiles and increase surrounding mines count.
-	for (int r = max(0, y - 1); r < min(rows_, y + 1); ++r)
+	for (int r = max(0, y - 1); r <= min(rows_-1, y + 1); ++r)
 	{
-		for (int c = max(0, x - 1); c < min(columns_, x + 1); ++c)
+		for (int c = max(0, x - 1); c <= min(columns_-1, x + 1); ++c)
 		{
-			if (r != y && c != x)
+			if ((r != y || c != x) && field_[r][c].surrounding_mines_count >= 0)
 			{
 				++field_[r][c].surrounding_mines_count;
 			}
@@ -90,7 +90,7 @@ void minesweeper::unmask(int x, int y) {
 		{
 			for (int c = max(0, x - 1); c <= min(columns_-1, x + 1); ++c)
 			{
-				if (r != y && c != x)
+				if (r != y || c != x)
 				{
 					unmask(c, r);
 				}
@@ -309,4 +309,11 @@ int minesweeper::valueOf(int x, int y) {
 	}
 	return field_[y][x].surrounding_mines_count;
 }
+
+#ifdef MINESWEEPER_DEBUG_MODE_SUPPORTED
+int minesweeper::debugModeValueOf(int x, int y) {
+	return field_[y][x].surrounding_mines_count;
+}
+#endif
+
 
