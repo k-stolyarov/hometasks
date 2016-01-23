@@ -13,7 +13,8 @@ using namespace std;
 namespace
 {
 	void playTime(minesweeper& play);
-	void viewStatistics();
+	// Display statistics on the screen and wait until user exits it.
+	void viewStatistics(bonus & ms);
 	// Prints a message on the screen with warning that entered action is unknown;
 	void print_unknown_action_error_message(const char action);
 	// display initial actions helper on the screen.
@@ -23,8 +24,6 @@ namespace
 	bool process_action_input(char action, bonus &ms);
 	// Check if action key is valid and can be processed correctly.
 	bool is_action_key_known(char action);
-	// Display statistics on the screen and wait until user exits it.
-	void display_statistics(bonus &ms);
 	// Print good-bye message on the screen.
 	void print_good_bye_message();
 } // end of anonymous namespace
@@ -79,8 +78,21 @@ void playTime(minesweeper& play) {
 
 /* display the statistics of the game. This is a bonus point function
  */
-void viewStatistics() {
-    cout << "Currently Not Supported \n" << endl;
+void viewStatistics(bonus &ms) {
+	clear_terminal_window();
+	const char * initial_statistics_header =
+		"Minesweeper statistics:\n";
+
+	printf("%s\n\n", initial_statistics_header);
+	printf("Total wins:\t%s%d%s\n", BOLD_MAGENTA_TEXT, ms.getWins(), NORMAL_TEXT);
+	printf("Total losses:\t%s%d%s\n", BOLD_MAGENTA_TEXT, ms.getLoss(), NORMAL_TEXT);
+	printf("Win/loss ratio:\t%s%lf%s\n", BOLD_MAGENTA_TEXT, ms.getRatio(), NORMAL_TEXT);
+	printf("\n");
+	printf("Current win streak:\t%s%d%s\n", BOLD_CYAN_TEXT, ms.getWinStreak(), NORMAL_TEXT);
+	printf("Longest win streak:\t%s%d%s\n", BOLD_CYAN_TEXT, ms.getLongestWinStreak(), NORMAL_TEXT);
+	printf("\n\n");
+	printf("Press any key to return to main menu\n");
+	get_input_char();
 }
 
 const char exit_action_key = 'q';
@@ -117,7 +129,7 @@ bool process_action_input(const char action, bonus &ms)
 	}
 	else if (action == view_stats_action_key)
 	{
-		display_statistics(ms);
+		viewStatistics(ms);
 	}
 	else if (action == start_game_action_key)
 	{
@@ -129,24 +141,6 @@ bool process_action_input(const char action, bonus &ms)
 bool is_action_key_known(const char action)
 {
 	return action == exit_action_key || action == start_game_action_key || action == view_stats_action_key;
-}
-
-void display_statistics(bonus &ms)
-{
-	clear_terminal_window();
-	const char * initial_statistics_header =
-		"Minesweeper statistics:\n";
-
-	printf("%s\n\n", initial_statistics_header);
-	printf("Total wins:\t%s%d%s\n", BOLD_MAGENTA_TEXT, ms.getWins(), NORMAL_TEXT);
-	printf("Total losses:\t%s%d%s\n", BOLD_MAGENTA_TEXT, ms.getLoss(), NORMAL_TEXT);
-	printf("Win/loss ratio:\t%s%lf%s\n", BOLD_MAGENTA_TEXT, ms.getRatio(), NORMAL_TEXT);
-	printf("\n");
-	printf("Current win streak:\t%s%d%s\n", BOLD_CYAN_TEXT, ms.getWinStreak(), NORMAL_TEXT);
-	printf("Longest win streak:\t%s%d%s\n", BOLD_CYAN_TEXT, ms.getLongestWinStreak(), NORMAL_TEXT);
-	printf("\n\n");
-	printf("Press any key to return to main menu\n");
-	get_input_char();
 }
 
 void print_good_bye_message()
