@@ -31,9 +31,13 @@ namespace
 	bool is_game_action_key_known(char action);
 	// process game action input from a user: load saved game, move cursor, or reveal/mark tile.
 	// return true if one more action processing is required.
-	bool process_game_action(char action, bonus & ms, bool & game_in_progress, CursorPosition & cursor);
+	bool process_game_action(char action, bonus & ms, bool & game_in_progress, bool & display_minefield, CursorPosition & cursor);
 	// print helper messages with allowed action for game playing.
 	void print_play_game_helper(bool game_in_progress);
+	// get character to be displayed for a specific tile.
+	std::string get_tile_char(bonus & ms, int x, int y);
+	// Display game boeard on the screen.
+	void print_game_board(bonus & ms, const CursorPosition & cursor, bool display_minefield);
 
 	void playTime(bonus& play);
 	// Display statistics on the screen and wait until user exits it.
@@ -113,6 +117,7 @@ const char move_cursor_up_action = 'w';
 const char move_cursor_down_action = 's';
 const char mark_tile_action_key = '?';
 const char open_tile_action_key = ' ';
+const char switch_debug_mode_action_key = '~';
 
 bool is_game_action_key_known(const char action)
 {
@@ -125,10 +130,16 @@ bool is_game_action_key_known(const char action)
 		|| action == move_cursor_up_action
 		|| action == move_cursor_down_action
 		|| action == mark_tile_action_key
-		|| action == open_tile_action_key;
+		|| action == open_tile_action_key
+		|| action == switch_debug_mode_action_key;
 }
 
-bool process_game_action(const char action, bonus & ms, bool & game_in_progress, CursorPosition & cursor)
+bool process_game_action(
+	const char action,
+	bonus & ms,
+	bool & game_in_progress,
+	bool & display_minefield,
+	CursorPosition & cursor)
 {
 	switch (action)
 	{
@@ -222,6 +233,9 @@ bool process_game_action(const char action, bonus & ms, bool & game_in_progress,
 		ms.revealLocation(cursor.x, cursor.y);
 		game_in_progress = true;
 		break;
+	case switch_debug_mode_action_key:
+		display_minefield = !display_minefield;
+		break;
 	}
 	return true;
 }
@@ -242,7 +256,7 @@ void print_play_game_helper(const bool game_in_progress)
 	}
 	printf("\n");
 	printf("To save game press '%s%c%s'.\n", BOLD_BRIGHT_RED_TEXT, save_game_action_key, NORMAL_TEXT);
-	printf("To start new game press '%s%c%s'.", BOLD_BRIGHT_RED_TEXT, save_game_action_key, NORMAL_TEXT);
+	printf("To start new game press '%s%c%s'.", BOLD_BRIGHT_RED_TEXT, start_new_game_action_key, NORMAL_TEXT);
 	if (game_in_progress)
 	{
 		printf(" %sNote, current game will be lost.%s", BOLD_YELLOW_TEXT, NORMAL_TEXT);
@@ -255,10 +269,11 @@ void print_play_game_helper(const bool game_in_progress)
 		BOLD_BRIGHT_RED_TEXT, move_cursor_right_action, NORMAL_TEXT,
 		BOLD_BRIGHT_RED_TEXT, move_cursor_up_action, NORMAL_TEXT,
 		BOLD_BRIGHT_RED_TEXT, move_cursor_down_action, NORMAL_TEXT);
+	printf("To switch debug mode press '%s%c%s'.\n", BOLD_BRIGHT_RED_TEXT, switch_debug_mode_action_key, NORMAL_TEXT);
 
 }
 
-std::string get_tile_char(bonus & ms, int x, int y)
+std::string get_tile_char(bonus & ms, const int x, const int y)
 {
 	if (ms.isRevealed(x, y))
 	{
@@ -284,25 +299,41 @@ std::string get_tile_char(bonus & ms, int x, int y)
 			return string(BOLD_BRIGHT_WHITE_TEXT) + number_plus_to_normal;
 		case 8:
 			return string(BOLD_WHITE_TEXT) + number_plus_to_normal;
+		default:
+			throw std::logic_error("Around an opened cell there are too many mines.");
 		}
 	}
 	else
 	{
 #ifdef MINESWEEPER_IS_MARKED_SUPPORTED
-		return ms.isMarked(x, y) ? (string(BOLD_BRIGHT_RED_TEXT) + "^" + NORMAL_TEXT) : " ";
-#else
-		return " ";
+		if (ms.isMarked(x, y))
+		{
+			return (string(BOLD_BRIGHT_RED_TEXT) + "^" + NORMAL_TEXT);
+		}
 #endif
+		return " ";
+
 	}
 }
 
-void print_game_board(bonus & ms, const CursorPosition & cursor)
+void print_game_board(bonus & ms, const CursorPosition & cursor, const bool desired_display_minefield)
 {
+#ifdef MINESWEEPER_DEBUG_MODE_SUPPORTED
+	const bool display_minefield = desired_display_minefield;
+#else
+	const bool display_minefield = false;
+#endif
+
 	std::string row;
 	row.clear();
 
 	row.resize(ms.getColNum() + 2, '-');
 	row[0] = row[row.size() - 1] = '+';
+	if (display_minefield)
+	{
+		row.resize(ms.getColNum()*2 + 3, '-');
+		row[row.size() - 1] = '+';
+	}
 	printf("%s\n", row.c_str());
 	for (int r = 0; r < ms.getRowNum(); ++r)
 	{
@@ -321,11 +352,49 @@ void print_game_board(bonus & ms, const CursorPosition & cursor)
 			}
 		}
 		row += '|';
+		if (display_minefield)
+		{
+			for (int c = 0; c < ms.getColNum(); ++c)
+			{
+#ifdef MINESWEEPER_DEBUG_MODE_SUPPORTED
+				const int v = ms.debugModeValueOf(c, r);
+#else
+				const int v = 0;
+#endif
+				char ch = 'x';
+				if (r == cursor.y && c == cursor.x)
+				{
+					ch = '@';
+				}
+				else
+				{
+					if (v < 0)
+					{
+						ch = '*';
+					}
+					else if (0 == v)
+					{
+						ch = ' ';
+					}
+					else
+					{
+						ch = '0' + v;
+					}
+				}
+				row += ch;
+			}
+			row += '|';
+		}
 		printf("%s\n", row.c_str());
 	}
 	row.clear();
 	row.resize(ms.getColNum() + 2, '-');
 	row[0] = row[row.size() - 1] = '+';
+	if (display_minefield)
+	{
+		row.resize(ms.getColNum() * 2 + 3, '-');
+		row[row.size() - 1] = '+';
+	}
 	printf("%s\n\n", row.c_str());
 }
 
@@ -340,10 +409,13 @@ void playTime(bonus& ms) {
 	CursorPosition cursor;
 	cursor.x = cursor.y = 0;
 	bool game_in_progress = false;
+
+	bool display_minefield = false;
+
 	while (1)
 	{
 		clear_terminal_window();
-		print_game_board(ms, cursor);
+		print_game_board(ms, cursor, display_minefield);
 		
 		if (unknown_action_input)
 		{
@@ -361,7 +433,7 @@ void playTime(bonus& ms) {
 		}
 
 		unknown_action_input = false;
-		if (!process_game_action(action, ms, game_in_progress, cursor))
+		if (!process_game_action(action, ms, game_in_progress, display_minefield, cursor))
 		{
 			// Exit game loop: game is finished by user manually.
 			break;
