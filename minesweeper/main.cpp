@@ -315,6 +315,10 @@ void print_game_board(bonus & ms, const CursorPosition & cursor)
 				row += YELLOW_BACKGROUND_TEXT;
 			}
 			row += get_tile_char(ms, c, r);
+			if (r == cursor.y && c == cursor.x)
+			{
+				row += NORMAL_TEXT;
+			}
 		}
 		row += '|';
 		printf("%s\n", row.c_str());
