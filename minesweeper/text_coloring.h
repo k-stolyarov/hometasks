@@ -17,7 +17,7 @@ const char * BOLD_CYAN_TEXT = "";
 const char * BOLD_BRIGHT_CYAN_TEXT = "";
 const char * BOLD_WHITE_TEXT = "";
 const char * BOLD_BRIGHT_WHITE_TEXT = "";
-
+const char * YELLOW_BACKGROUND_TEXT = "";
 #else // linux, Mac
 
 const char * NORMAL_TEXT = "\x1B[0m";
@@ -35,6 +35,7 @@ const char * BOLD_CYAN_TEXT = "\x1B[1;36m";
 const char * BOLD_BRIGHT_CYAN_TEXT = "\x1B[38;5;0Em";
 const char * BOLD_WHITE_TEXT = "\x1B[1;37m";
 const char * BOLD_BRIGHT_WHITE_TEXT = "\x1B[38;5;0Fm";
+const char * YELLOW_BACKGROUND_TEXT = "\x1B[43m";
 #endif
 
 #endif // #ifndef TEXT_COLORING_H
