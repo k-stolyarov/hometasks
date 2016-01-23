@@ -214,6 +214,11 @@ bool process_game_action(const char action, bonus & ms, bool & game_in_progress,
 		}
 		break;
 	case open_tile_action_key:
+		if (!game_in_progress)
+		{
+			// that is first turn, field initialization required.
+			ms.initialMineField(cursor.x, cursor.y);
+		}
 		ms.revealLocation(cursor.x, cursor.y);
 		game_in_progress = true;
 		break;
@@ -358,36 +363,39 @@ void playTime(bonus& ms) {
 			break;
 		}
 
-		const int game_state = ms.endGame();
-		if (0 != game_state)
+		if (game_in_progress)
 		{
-			const char * game_end_message = "";
-			// update statistics
-			switch (game_state)
+			const int game_state = ms.endGame();
+			if (0 != game_state)
 			{
-			case -1:
-				// loss
-				ms.setWinStreak(0);
-				ms.setLoss(ms.getLoss() + 1);
-				game_end_message = "You've lost.";
-				break;
-			case 1:
-				// win
-				ms.setWins(ms.getWins() + 1);
-				ms.setWinStreak(ms.getWinStreak() + 1);
-				if (ms.getWinStreak() > ms.getLongestWinStreak())
+				const char * game_end_message = "";
+				// update statistics
+				switch (game_state)
 				{
-					ms.setLongestWinStreak(ms.getWinStreak());
+				case -1:
+					// loss
+					ms.setWinStreak(0);
+					ms.setLoss(ms.getLoss() + 1);
+					game_end_message = "You've lost.";
+					break;
+				case 1:
+					// win
+					ms.setWins(ms.getWins() + 1);
+					ms.setWinStreak(ms.getWinStreak() + 1);
+					if (ms.getWinStreak() > ms.getLongestWinStreak())
+					{
+						ms.setLongestWinStreak(ms.getWinStreak());
+					}
+					game_end_message = "You win!";
+					break;
 				}
-				game_end_message = "You win!";
-				break;
-			}
-			ms.saveStatistics(statistics_file_name);
+				ms.saveStatistics(statistics_file_name);
 
-			if (!play_once_again(game_end_message))
-			{
-				// user decided not to play one more time. Exit main game loop and return back to main menu.
-				break;
+				if (!play_once_again(game_end_message))
+				{
+					// user decided not to play one more time. Exit main game loop and return back to main menu.
+					break;
+				}
 			}
 		}
 	}

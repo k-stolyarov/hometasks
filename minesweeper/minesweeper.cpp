@@ -79,12 +79,16 @@ void minesweeper::unmask(int x, int y) {
 	{
 		throw std::logic_error("Logic error: unmask cannot be called for a tile with a mine.");
 	}
+	if (!field_[y][x].hidden)
+	{
+		return;
+	}
 	field_[y][x].hidden = false;
 	if (0 == field_[y][x].surrounding_mines_count)
 	{
-		for (int r = max(0, y - 1); r < min(rows_, y + 1); ++r)
+		for (int r = max(0, y - 1); r <= min(rows_-1, y + 1); ++r)
 		{
-			for (int c = max(0, x - 1); c < min(columns_, x + 1); ++c)
+			for (int c = max(0, x - 1); c <= min(columns_-1, x + 1); ++c)
 			{
 				if (r != y && c != x)
 				{
@@ -268,7 +272,7 @@ void minesweeper::onlyMines() {
 	{
 		for (int c = 0; c < columns_; ++c)
 		{
-			if (!field_[r][c].has_mine && !field_[r][c].hidden)
+			if (!field_[r][c].has_mine && field_[r][c].hidden)
 			{
 				// tile without mine is not opened. Game is not finished.
 				game_status_ = ONGOING;

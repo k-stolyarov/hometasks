@@ -74,5 +74,5 @@ void bonus::setLongestWinStreak(int win_streak)
 
 void bonus::initialMineField(int fpX, int fpY)
 {
-	// \todo implement;
+	minesweeper::initialMineField(fpX, fpY);
 }
