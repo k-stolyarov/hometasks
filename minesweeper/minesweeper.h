@@ -13,26 +13,38 @@ using namespace std;
 
 class minesweeper {
 private:
-	struct FieldCell
+	struct BoardTile
 	{
+		BoardTile();
+
+		// Is tile visible
 		bool hidden;
-		bool hash_mine;
-		size_t surrounding_mines_count;
+		// Do tile contain a mine
+		bool has_mine;
+		// Is tile marked as potential mine
+		bool is_marked;
+		// Amount of surrounding mines (if tile contain mine value is -1)
+		int surrounding_mines_count;
 	};
+	enum GameStatus
+	{
+		LOSS = -1,
+		ONGOING = 0,
+		WIN = 1
+	};
+
 private:
-	int colNum;                                     //number of columns on game board (X))
-	int rowNum;                                     //number of rows on game board(Y)
-	int minesNum;                                   //number of mines placed on game board
-	int end;                                       //end game condition tracker (-1 loss, 0 ongoing, 1 win)
-	vector<vector<int> > mineField;       //actual representation of game board (-1 mine, 0 no surrounding, # > 0 number of surrounding mines)
-	vector<vector<bool> > bitField;       //representation of tiles to be hidden or shown (true hidden, false shown). 
+	int columns_;                                  //number of columns on game board (X))
+	int rows_;                                  //number of rows on game board(Y)
+	int mines_;                                //number of mines placed on game board
+	GameStatus game_status_;                                 //end game condition tracker (-1 loss, 0 ongoing, 1 win)
+	vector<vector<BoardTile> > field_;           //actual representation of game board
 
-	void calculateSurrounding(int row, int col);    //Updates board tiles by adding 1 to tiles surrounding mine except when adjacent tile is mine
-	void onlyMines();                               //Checks end game status (int end). Should check entire playing field, no internal counter
-	int randomPick(int num);                        //Randomly generates number between 0 and num
-	void unmask(int row, int col);                  //Actual function to reveal blank tile. Makes recursive calls for 0 value tiles
-
-
+	int randomPick(int num);						// return number in range 0.... num-1
+	void clearField();								// clear minefield and set it's size to specified value.
+	void calculateSurrounding(int x, int y);                    //Updates board tiles by adding 1 to tiles surrounding mine except when adjacent tile is mine
+	void onlyMines();								// Update game_status with ONGOING or WIN values.
+	void unmask(int x, int y);                  //Actual function to reveal blank tile. Makes recursive calls for 0 value tiles
 public:
 
 	minesweeper();                                  //Default constructor
@@ -47,7 +59,8 @@ public:
 	void initialMineField(string path);             //Initialize game board given first revealed tile
 	bool isRevealed(int x, int y);                  //Checks if tile has been already revealed
 	void revealLocation(int x, int y);              //Reveals selected tile. Selected tile should return true on subsequent isRevealed calls, the left click action
-	void markLocation(int x, int y);                  // mark a cell as potential mine, the right click action
+	bool isMarked(int x, int y);					//Checks if tile has been already marked
+	void markLocation(int x, int y);                // mark a cell as potential mine, the right click action	
 	int valueOf(int x, int y);                      //Returns tile value (# of surrounding mines if not mine)
 };
 

@@ -1,18 +1,112 @@
 #include "minesweeper.h"
+#include <fstream>
 
 using namespace std;
 
-minesweeper::minesweeper() {
-	// TODO - default two dimension array is 9 X 9 with 10 mines
+minesweeper::BoardTile::BoardTile()
+	: hidden(true)
+	, has_mine(false)
+	, is_marked(false)
+	, surrounding_mines_count(0)
+{
 }
 
-minesweeper::minesweeper(int col, int row, int numOfMines) {
-	// TODO Auto-generated constructor stub
-	// TODO - two dimension gameboard size col x num with numOfMines mines
+/**
+* Returns int randomly generated between 0 and num
+*
+* @param   num Upper limit of randomly generated number
+* @return      Number of rows on playing field
+* @see         initialMineField()
+* */
+int minesweeper::randomPick(int num)
+{
+	return rand() % num;
+}
+
+void minesweeper::clearField()
+{
+	field_.resize(rows_);
+	for (int i = 0; i < rows_; ++i)
+	{
+		field_[i].resize(columns_);
+		for (int j = 0; j < columns_; ++j)
+		{
+			field_[i][j] = BoardTile();
+		}
+	}
+	game_status_ = ONGOING;
+}
+
+/**
+* Generates numbers for surrounding tiles of mines. The only
+* tiles with numbers are those surrounding mines; these tiles are
+* updated as mines are generated.
+
+*
+* @param   x Column number of generated mine
+* @param   y Row number of generated mine
+* @see     initialMineField()
+* */
+void minesweeper::calculateSurrounding(int x, int y) {
+	field_[y][x].surrounding_mines_count = -1;
+	
+	// iterate over 3x3 tiles and increase surrounding mines count.
+	for (int r = max(0, y - 1); r < min(rows_, y + 1); ++r)
+	{
+		for (int c = max(0, x - 1); c < min(columns_, x + 1); ++c)
+		{
+			if (r != y && c != x)
+			{
+				++field_[r][c].surrounding_mines_count;
+			}
+		}
+	}
+}
+
+/**
+* Reveals surrounding tiles. Should only be called if
+* user selected tile was not mine or had no surrounding
+* mines. Will recursively call itself to reveal all
+* adjacent blank tiles.
+*
+* @param   x Column number of user selected tile
+* @param   y Row number of user selected tile
+* @see         revealLocation();
+* */
+void minesweeper::unmask(int x, int y) {
+	if (field_[y][x].has_mine)
+	{
+		throw std::logic_error("Logic error: unmask cannot be called for a tile with a mine.");
+	}
+	field_[y][x].hidden = false;
+	if (0 == field_[y][x].surrounding_mines_count)
+	{
+		for (int r = max(0, y - 1); r < min(rows_, y + 1); ++r)
+		{
+			for (int c = max(0, x - 1); c < min(columns_, x + 1); ++c)
+			{
+				if (r != y && c != x)
+				{
+					unmask(c, r);
+				}
+			}
+		}
+	}
+}
+
+minesweeper::minesweeper()
+	: minesweeper(9, 9, 10)
+{
+}
+
+minesweeper::minesweeper(int col, int row, int numOfMines)
+	: rows_(row)
+	, columns_(col)
+	, mines_(numOfMines)
+{
 }
 
 minesweeper::~minesweeper() {
-	// TODO Auto-generated destructor stub
 }
 
 /**
@@ -22,7 +116,7 @@ minesweeper::~minesweeper() {
  * */
 int minesweeper::getRowNum()
 {
-	return 0;
+	return rows_;
 }
 
 /**
@@ -32,7 +126,7 @@ int minesweeper::getRowNum()
  * */
 int minesweeper::getColNum()
 {
-	return 0;
+	return columns_;
 }
 /**
  * Returns int representing number of mines on current playing field.
@@ -42,19 +136,7 @@ int minesweeper::getColNum()
  * */
 int minesweeper::getMinesNum()
 {
-	return 0;
-}
-
-/**
- * Returns int randomly generated between 0 and num
- *
- * @param   num Upper limit of randomly generated number
- * @return      Number of rows on playing field
- * @see         initialMineField()
- * */
-int minesweeper::randomPick(int num)
-{
-	return rand() % num;
+	return mines_;
 }
 
 /**
@@ -66,10 +148,32 @@ int minesweeper::randomPick(int num)
  * @see     calculateSurrounding()
  * @see     randomPick()
  * */
-void minesweeper::initialMineField(int fpX, int fpY) {
-	//Generate our map and mask
-	//TODO - generate all mines randomly
-	//surrounding tile values should be updated to reflect presence of adjacent mine
+void minesweeper::initialMineField(const int fpX, const int fpY) {
+	std::vector<std::pair<int, int>> tiles;
+	tiles.reserve(rows_ * columns_);
+
+	for (int i = 0; i < rows_; ++i)
+	{
+		for (int j = 0; j < columns_; ++j)
+		{
+			tiles.push_back(std::make_pair(i, j));
+		}
+	}
+	// randomly shuffle possible mines positions
+	for (int i = 0; i < static_cast<int>(tiles.size()); ++i)
+	{
+		swap(tiles[randomPick(tiles.size())], tiles[randomPick(tiles.size())]);
+	}
+
+	// Place mines at first @mines_ positions.
+	clearField();
+	for (int i = 0; i < mines_; ++i)
+	{
+		const int row = tiles[i].first;
+		const int column = tiles[i].second;
+		field_[row][column].has_mine = true;
+		calculateSurrounding(column, row);
+	}
 }
 
 /**
@@ -79,23 +183,18 @@ void minesweeper::initialMineField(int fpX, int fpY) {
  * @param   path to load MineField from
  * */
 void minesweeper::initialMineField(string path) { 
-	//TODO - load mine field from path
-	//Is not concerned with user's first tile
-}
-
-/**
- * Generates numbers for surrounding tiles of mines. The only
- * tiles with numbers are those surrounding mines; these tiles are
- * updated as mines are generated.
-
- *
- * @param   row Row number of generated mine
- * @param   col Column number of generated mine
- * @see     initialMineField()
- * */
-void minesweeper::calculateSurrounding(int row, int col) {
-	//TODO - should update surrounding tiles to reflect
-	//presence of adjacent mine
+	ifstream fs(path.c_str());
+	fs >> rows_ >> columns_ >> mines_;
+	clearField();
+	for (int i = 0; i < mines_; ++i)
+	{
+		int r, c;
+		char open;
+		char close;
+		fs >> open >> r >> c >> close;
+		field_[r][c].has_mine = true;
+		calculateSurrounding(c, r);
+	}
 }
 
 /**
@@ -109,9 +208,13 @@ void minesweeper::calculateSurrounding(int row, int col) {
  * @see         unmask();
  * */
 void minesweeper::revealLocation(int x, int y) {
-	//TODO - update the bitField to reflect the user's
-	//tile selection. Should rely on unmask to do actual
-	//reveal operation.
+	if (field_[y][x].has_mine)
+	{
+		// We stepped into a mine. BOOM!
+		game_status_ = LOSS;
+		return;
+	}
+	unmask(x, y);
 }
 
 /**
@@ -122,8 +225,7 @@ void minesweeper::revealLocation(int x, int y) {
  * @param y row number of the cell selected
  */
 void minesweeper::markLocation(int x, int y) {
-    // TODO - update the display for the selected cell, change it
-    // to marked if it's not marked, or to unmarked if it's already marked
+	field_[y][x].is_marked = !field_[y][x].is_marked;
 }
 
 /**
@@ -136,11 +238,11 @@ void minesweeper::markLocation(int x, int y) {
  * @see		revealLocation();
  * */
 int minesweeper::endGame() {
-	//TODO - return current end game status.
-	//Calling this method should only update int end with
-	//win or ongoing condition. revealLocation should
-	//update if there is loss condition.
-	return 0;
+	if (game_status_ != LOSS)
+	{
+		onlyMines();
+	}
+	return game_status_;
 }
 
 /**
@@ -152,7 +254,20 @@ int minesweeper::endGame() {
  * @see         endGame();
  * */
 void minesweeper::onlyMines() {
-	//TODO - check for win condition, otherwise ongoing
+	game_status_ = WIN;
+	// check that all free-of-mines cells are opened
+	for (int r = 0; r < rows_; ++r)
+	{
+		for (int c = 0; c < columns_; ++c)
+		{
+			if (!field_[r][c].has_mine && !field_[r][c].hidden)
+			{
+				// tile without mine is not opened. Game is not finished.
+				game_status_ = ONGOING;
+				return;
+			}
+		}
+	}
 }
 
 /**
@@ -163,8 +278,8 @@ void minesweeper::onlyMines() {
  * @see         valueOf();
  * */
 bool minesweeper::isRevealed(int x, int y) {
-	//TODO - check if a user has revealed a specific tile
-	return false;
+	
+	return !field_[y][x].hidden;
 }
 
 /**
@@ -176,23 +291,10 @@ bool minesweeper::isRevealed(int x, int y) {
  * @see         isRevealed();
  * */
 int minesweeper::valueOf(int x, int y) {
-	//TODO - returns the value of specific tile.
-	//should only be called if tile isRevealed.
-	return 0;
+	if (field_[y][x].hidden)
+	{
+		throw std::logic_error("According to game logic reveal is required before getting tile value.");
+	}
+	return field_[y][x].surrounding_mines_count;
 }
 
-/**
- * Reveals surrounding tiles. Should only be called if
- * user selected tile was not mine or had no surrounding
- * mines. Will recursively call itself to reveal all
- * adjacent blank tiles.
- *
- * @param   row Row number of user selected tile
- * @param   col Column number of user selected tile
- * @see         revealLocation();
- * */
-void minesweeper::unmask(int row,int col) {
-	//TODO - reveal the tile here.
-	//This method should reveal surrounding tiles
-	//if the tile revealed had a value of 0
-}
