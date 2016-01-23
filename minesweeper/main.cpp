@@ -4,7 +4,8 @@
 #include "minesweeper.h"
 #include "bonus.h"
 
-#include "clear_screen.h"
+#include "clear_terminal_window.h"
+#include "get_input_char.h"
 
 using namespace std;
 
@@ -38,14 +39,14 @@ int main() {
 	bool unknown_action_input = false;
 	bonus ms;
 	while (1) {
-		clear_screen();
+		clear_terminal_window();
 		if (unknown_action_input)
 		{
 			print_unknown_action_error_message(action);
 		}
 		print_initial_actions();
 
-		cin.get(action);
+		action =  get_input_char();
 		if (!is_action_key_known(action))
 		{
 			unknown_action_input = true;
@@ -58,9 +59,9 @@ int main() {
 			break;
 		}
 	}
-	clear_screen();
+	clear_terminal_window();
 	print_good_bye_message();
-    return 0;
+	return 0;
 }
 
 namespace
@@ -147,7 +148,7 @@ bool is_action_key_known(const char action)
 
 void display_statistics(bonus &ms)
 {
-	clear_screen();
+	clear_terminal_window();
 	const char * initial_statistics_header =
 		"Minesweeper statistics:\n";
 
@@ -160,13 +161,11 @@ void display_statistics(bonus &ms)
 	printf("Longest win streak:\t%s%d%s\n", BOLD_CYAN_TEXT, ms.getLongestWinStreak(), NORMAL_TEXT);
 	printf("\n\n");
 	printf("Press any key to return to main menu\n");
-	char ch;
-	cin.get(ch);
+	get_input_char();
 }
 
 void print_good_bye_message()
 {
-	clear_screen();
 	printf("Minesweeper game is finished. Good bye!\n");
 }
 
