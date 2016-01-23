@@ -99,6 +99,12 @@ void minesweeper::unmask(int x, int y) {
 	}
 }
 
+bool minesweeper::is_tile_allowed_to_place_mine(int fpX, int fpY, int tile_x, int tile_y) const
+{
+	// in default implementation with 1-turn end all tiles are allowed to place mine
+	return true;
+}
+
 minesweeper::minesweeper()
 	: minesweeper(9, 9, 10)
 {
@@ -162,7 +168,10 @@ void minesweeper::initialMineField(const int fpX, const int fpY) {
 	{
 		for (int j = 0; j < columns_; ++j)
 		{
-			tiles.push_back(std::make_pair(i, j));
+			if (is_tile_allowed_to_place_mine(fpX, fpY, j, i))
+			{
+				tiles.push_back(std::make_pair(i, j));
+			}
 		}
 	}
 	// randomly shuffle possible mines positions

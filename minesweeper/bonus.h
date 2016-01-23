@@ -24,14 +24,17 @@ public:
 	int getLongestWinStreak();             //Returns longest Win Streak (largest win streak seen)
 	void setLongestWinStreak(int wins_streak);            //Modifies longest Win Streak (largest win streak seen)
 
-	virtual void initialMineField(int fpX, int fpY) override;	//Initialize game board given first revealed tile.
-	//Overrides minesweeper.initialMineField(fpX,fpY)
-
 
 protected:
+	//Overrides minesweeper::is_tile_allowed_to_place_mine to change behaviour of mines placement.
+	virtual bool is_tile_allowed_to_place_mine(int fpX, int fpY, int tile_x, int tile_y) const;
+	
+private:
+	// Parse a single line from input file and save value  to one of fields.
+	void parse_line(const std::string & line);
+
 	int wins;                               // # of total wins
 	int loss;                               // # of total losses
-	double ratio;                           // Win/Loss ratio
 	int winStreak;                          // Current win streak count
 	int longestWinStreak;                   // Longest win streak count
 };

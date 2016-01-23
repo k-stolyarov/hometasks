@@ -49,7 +49,9 @@ private:
 	void calculateSurrounding(int x, int y);                    //Updates board tiles by adding 1 to tiles surrounding mine except when adjacent tile is mine
 	void onlyMines();								// Update game_status with ONGOING or WIN values.
 	void unmask(int x, int y);                  //Actual function to reveal blank tile. Makes recursive calls for 0 value tiles
-
+protected:
+	// Check if tile with coordinates(tile_x, tile_y) is allowed to place mine.
+	virtual bool is_tile_allowed_to_place_mine(int fpX, int fpY, int tile_x, int tile_y) const;
 public:
 
 	minesweeper();                                  //Default constructor
