@@ -11,6 +11,9 @@
 
 using namespace std;
 
+// Extended support of fetching "isMarked" flag for a tile. For better UI.
+#define MINESWEEPER_IS_MARKED_SUPPORTED
+
 class minesweeper {
 private:
 	struct BoardTile
@@ -60,7 +63,9 @@ public:
 	void initialMineField(string path);             //Initialize game board given first revealed tile
 	bool isRevealed(int x, int y);                  //Checks if tile has been already revealed
 	void revealLocation(int x, int y);              //Reveals selected tile. Selected tile should return true on subsequent isRevealed calls, the left click action
-	bool isMarked(int x, int y);					//Checks if tile has been already marked
+#ifdef MINESWEEPER_IS_MARKED_SUPPORTED
+	bool isMarked(int x, int y) const;				//Checks if tile has been already marked
+#endif // #ifdef MINESWEEPER_IS_MARKED_SUPPORTED
 	void markLocation(int x, int y);                // mark a cell as potential mine, the right click action	
 	int valueOf(int x, int y);                      //Returns tile value (# of surrounding mines if not mine)
 };

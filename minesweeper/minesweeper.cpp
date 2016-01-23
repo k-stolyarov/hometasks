@@ -218,6 +218,12 @@ void minesweeper::revealLocation(int x, int y) {
 	unmask(x, y);
 }
 
+#ifdef MINESWEEPER_IS_MARKED_SUPPORTED
+bool minesweeper::isMarked(int x, int y) const {
+	return field_[y][x].is_marked;
+}
+#endif
+
 /**
  * Allow the user to mark a cell as a potential mine. Marking an already
  * marked cell will remove the mark for that cell
