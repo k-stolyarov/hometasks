@@ -502,7 +502,7 @@ const char view_stats_action_key = 's';
 
 void print_unknown_action_error_message(const char action)
 {
-	printf("%sWarning!%s Unknown input action entered: '%s%c%s'", BOLD_YELLOW_TEXT, NORMAL_TEXT, BOLD_BRIGHT_RED_TEXT, action, NORMAL_TEXT);
+	printf("%sWarning!%s Unknown input action entered: '%s%c%s'\n", BOLD_YELLOW_TEXT, NORMAL_TEXT, BOLD_BRIGHT_RED_TEXT, action, NORMAL_TEXT);
 }
 
 void print_initial_actions()
