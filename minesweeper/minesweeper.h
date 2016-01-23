@@ -45,6 +45,7 @@ private:
 	void calculateSurrounding(int x, int y);                    //Updates board tiles by adding 1 to tiles surrounding mine except when adjacent tile is mine
 	void onlyMines();								// Update game_status with ONGOING or WIN values.
 	void unmask(int x, int y);                  //Actual function to reveal blank tile. Makes recursive calls for 0 value tiles
+
 public:
 
 	minesweeper();                                  //Default constructor
@@ -55,7 +56,7 @@ public:
 	int getRowNum();                                //Return # of rows for game board
 	int getMinesNum();                              //Return total # of mines on game board
 	int endGame();                                  //Return current end game status
-	void initialMineField(int fpX, int fpY);        //Initialize game board given file path of initial mine placement w/o checking for 1st turn game over
+	virtual void initialMineField(int fpX, int fpY);        //Initialize game board given file path of initial mine placement w/o checking for 1st turn game over
 	void initialMineField(string path);             //Initialize game board given first revealed tile
 	bool isRevealed(int x, int y);                  //Checks if tile has been already revealed
 	void revealLocation(int x, int y);              //Reveals selected tile. Selected tile should return true on subsequent isRevealed calls, the left click action
