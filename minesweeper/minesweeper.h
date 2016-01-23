@@ -73,7 +73,7 @@ public:
 	int valueOf(int x, int y);                      //Returns tile value (# of surrounding mines if not mine)
 #ifdef MINESWEEPER_DEBUG_MODE_SUPPORTED
 	int debugModeValueOf(int x, int y);                      //Returns tile value (# of surrounding mines if not mine)
-#endif MINESWEEPER_DEBUG_MODE_SUPPORTED
+#endif // MINESWEEPER_DEBUG_MODE_SUPPORTED
 };
 
 

@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <stdio.h>
+#include <stdexcept>
 #include "minesweeper.h"
 #include "bonus.h"
 
@@ -168,6 +169,7 @@ bool process_game_action(
 		char buf[1024];
 		fgets(buf, sizeof(buf), stdout);
 		ms.loadGame(buf);
+		cursor.x = cursor.y = 0;
 		break;
 	}
 	case save_game_action_key:
@@ -204,6 +206,7 @@ bool process_game_action(
 		numberOfMines = std::min(rows * columns - 1, std::max(1, numberOfMines));
 
 		ms = bonus(columns, rows, numberOfMines);
+		cursor.x = cursor.y = 0;
 		break;
 	}
 	case move_cursor_left_action:
@@ -411,6 +414,8 @@ void playTime(bonus& ms) {
 	bool game_in_progress = false;
 
 	bool display_minefield = false;
+	ms = bonus(ms.getColNum(), ms.getRowNum(), ms.getMinesNum());
+	ms.loadStatistics(statistics_file_name);
 
 	while (1)
 	{
@@ -444,6 +449,7 @@ void playTime(bonus& ms) {
 			const int game_state = ms.endGame();
 			if (0 != game_state)
 			{
+				game_in_progress = false;
 				const char * game_end_message = "";
 				// update statistics
 				switch (game_state)
@@ -472,6 +478,8 @@ void playTime(bonus& ms) {
 					// user decided not to play one more time. Exit main game loop and return back to main menu.
 					break;
 				}
+				ms = bonus(ms.getColNum(), ms.getRowNum(), ms.getMinesNum());
+				ms.loadStatistics(statistics_file_name);
 			}
 		}
 	}
