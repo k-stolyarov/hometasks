@@ -106,8 +106,11 @@ bool minesweeper::is_tile_allowed_to_place_mine(int fpX, int fpY, int tile_x, in
 }
 
 minesweeper::minesweeper()
-	: minesweeper(9, 9, 10)
+	: rows_(9)
+	, columns_(9)
+	, mines_(10)
 {
+	clearField();
 }
 
 minesweeper::minesweeper(int col, int row, int numOfMines)
@@ -161,7 +164,7 @@ int minesweeper::getMinesNum()
  * @see     randomPick()
  * */
 void minesweeper::initialMineField(const int fpX, const int fpY) {
-	std::vector<std::pair<int, int>> tiles;
+	std::vector< std::pair<int, int> > tiles;
 	tiles.reserve(rows_ * columns_);
 
 	for (int i = 0; i < rows_; ++i)
