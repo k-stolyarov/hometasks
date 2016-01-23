@@ -202,14 +202,19 @@ void minesweeper::initialMineField(const int fpX, const int fpY) {
  * */
 void minesweeper::initialMineField(string path) { 
 	ifstream fs(path.c_str());
-	fs >> rows_ >> columns_ >> mines_;
+	if (!fs.good())
+	{
+		return;
+	}
+
+	fs >> columns_ >> rows_ >> mines_;
 	clearField();
 	for (int i = 0; i < mines_; ++i)
 	{
 		int r, c;
 		char open;
 		char close;
-		fs >> open >> r >> c >> close;
+		fs >> open >> c >> r >> close;
 		field_[r][c].has_mine = true;
 		calculateSurrounding(c, r);
 	}

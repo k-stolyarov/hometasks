@@ -44,11 +44,31 @@ bonus::bonus(int col, int row, int numOfMines)
 
 int bonus::saveGame(std::string path)
 {
+#ifdef MINESWEEPER_DEBUG_MODE_SUPPORTED
+	ofstream fs(path.c_str());
+	fs << getColNum() << std::endl;
+	fs << getRowNum() << std::endl;
+	fs << getMinesNum() << std::endl;
+	fs << std::endl;
+	for (int r = 0; r < getRowNum(); ++r)
+	{
+		for (int c = 0; c < getColNum(); ++c)
+		{
+			const int value = debugModeValueOf(c, r);
+			if (-1 == value)
+			{
+				fs << "(" << c << " " << r << ")" << std::endl;
+			}
+		}
+	}
+#endif
+
 	return 0;
 }
 
 int bonus::loadGame(std::string path)
 {
+	initialMineField(path);
 	return 0;
 }
 

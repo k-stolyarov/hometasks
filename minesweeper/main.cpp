@@ -167,16 +167,17 @@ bool process_game_action(
 
 		printf("Enter file name with saved game:\n");
 		char buf[1024];
-		fgets(buf, sizeof(buf), stdout);
+		scanf("%s", buf);
 		ms.loadGame(buf);
 		cursor.x = cursor.y = 0;
+		game_in_progress = true;
 		break;
 	}
 	case save_game_action_key:
 	{
 		printf("Enter file name to save the game:\n");
 		char buf[1024];
-		fgets(buf, sizeof(buf), stdout);
+		scanf("%s", buf);
 		ms.saveGame(buf);
 		break;
 	}
