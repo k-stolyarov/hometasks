@@ -105,6 +105,7 @@ minesweeper::minesweeper(int col, int row, int numOfMines)
 	, columns_(col)
 	, mines_(numOfMines)
 {
+	clearField();
 }
 
 minesweeper::~minesweeper() {
